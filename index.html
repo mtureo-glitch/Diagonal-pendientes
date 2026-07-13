@@ -15,7 +15,7 @@ body{background:#ddd;font-size:12px;color:#1a1a1a;overflow:hidden;height:100vh;}
 .btn-excel{border:1px solid #1a6b1a;background:#e8f4e8;color:#1a6b1a;padding:4px 12px;border-radius:3px;cursor:pointer;font-size:11px;font-weight:600;}
 .btn-excel:hover{background:#27ae60;color:#fff;}
 .btn-clear:hover{background:#f5f5f5;}
-.hdr-title{font-size:14px;font-weight:400;letter-spacing:1.5px;flex:1;text-align:center;color:#333;}
+.hdr-title{font-size:14px;font-weight:400;letter-spacing:1.5px;flex:1;text-align:center;color:#333;line-height:1.6;}
 .logo{font-size:28px;font-weight:900;letter-spacing:2px;color:#695F58;}
 
 /* TABLE AREA */
@@ -90,7 +90,7 @@ td.right-foot{text-align:right;font-weight:700;}
 <!-- HEADER -->
 <div class="hdr">
   <button class="btn-clear" onclick="clearFilters()">Quitar Filtros</button>
-  <div class="hdr-title">DIAGONAL DE PENDIENTES</div>
+  <div class="hdr-title">DIAGONAL DE PENDIENTES<br><span id="last-update" style="font-size:10px;font-weight:400;color:rgba(255,255,255,0.7);letter-spacing:0.5px;">Última actualización: 13/07/2026</span></div>
   <button class="btn-excel" onclick="exportExcel()" title="Descargar Excel">⬇ Excel</button>
   <div class="logo">arauco</div>
 </div>
@@ -473,7 +473,7 @@ function exportExcel(){
 <!-- HEADER -->
 <div class="hdr">
   <button class="btn-clear" onclick="clearFilters()">Quitar Filtros</button>
-  <div class="hdr-title">DIAGONAL DE PENDIENTES</div>
+  <div class="hdr-title">DIAGONAL DE PENDIENTES<br><span id="last-update" style="font-size:10px;font-weight:400;color:rgba(255,255,255,0.7);letter-spacing:0.5px;">Última actualización: 13/07/2026</span></div>
   <button class="btn-excel" onclick="exportExcel()" title="Descargar Excel">⬇ Excel</button>
   <div class="logo">arauco</div>
 </div>
