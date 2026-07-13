@@ -90,7 +90,7 @@ td.right-foot{text-align:right;font-weight:700;}
 <!-- HEADER -->
 <div class="hdr">
   <button class="btn-clear" onclick="clearFilters()">Quitar Filtros</button>
-  <div class="hdr-title">DIAGONAL DE PENDIENTES<br><span id="last-update" style="font-size:10px;font-weight:400;color:rgba(255,255,255,0.7);letter-spacing:0.5px;">Última actualización: 13/07/2026</span></div>
+  <div class="hdr-title">DIAGONAL DE PENDIENTES<br><span id="last-update" style="font-size:10px;font-weight:400;color:rgba(255,255,255,0.7);letter-spacing:0.5px;">Cargando...</span></div>
   <button class="btn-excel" onclick="exportExcel()" title="Descargar Excel">⬇ Excel</button>
   <div class="logo">arauco</div>
 </div>
@@ -197,6 +197,18 @@ td.right-foot{text-align:right;font-weight:700;}
 
 <script>
 (async function(){
+  // Obtener fecha del último commit de data.json
+  try {
+    const commitResp = await fetch('https://api.github.com/repos/mtureo-glitch/Diagonal-pendientes/commits?path=data.json&per_page=1');
+    const commits = await commitResp.json();
+    if(commits && commits.length > 0){
+      const fechaISO = commits[0].commit.author.date;
+      const fecha = new Date(fechaISO);
+      const fechaStr = fecha.toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+      document.getElementById('last-update').textContent = 'Última actualización: ' + fechaStr;
+    }
+  } catch(e){ document.getElementById('last-update').textContent = ''; }
+
   const resp = await fetch('data.json');
 
 const D = await resp.json();
@@ -473,7 +485,7 @@ function exportExcel(){
 <!-- HEADER -->
 <div class="hdr">
   <button class="btn-clear" onclick="clearFilters()">Quitar Filtros</button>
-  <div class="hdr-title">DIAGONAL DE PENDIENTES<br><span id="last-update" style="font-size:10px;font-weight:400;color:rgba(255,255,255,0.7);letter-spacing:0.5px;">Última actualización: 13/07/2026</span></div>
+  <div class="hdr-title">DIAGONAL DE PENDIENTES<br><span id="last-update" style="font-size:10px;font-weight:400;color:rgba(255,255,255,0.7);letter-spacing:0.5px;">Cargando...</span></div>
   <button class="btn-excel" onclick="exportExcel()" title="Descargar Excel">⬇ Excel</button>
   <div class="logo">arauco</div>
 </div>
