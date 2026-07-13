@@ -197,7 +197,9 @@ td.right-foot{text-align:right;font-weight:700;}
 
 <script>
 (async function(){
-  // Obtener fecha del último commit de data.json (zona horaria Chile)
+  // Fecha embebida como fallback
+  const elFecha = document.getElementById('last-update');
+  if(elFecha) elFecha.textContent = 'Última actualización: 13/07/2026 08:06 hrs';
   try {
     const commitResp = await fetch('https://api.github.com/repos/mtureo-glitch/Diagonal-pendientes/commits?path=data.json&per_page=1&t='+Date.now());
     const commits = await commitResp.json();
@@ -288,6 +290,7 @@ function refreshSlicerOptions(){
   setAvail('acta',av.acta);setAvail('ep',av.ep);setAvail('sp',av.sp);
   setAvail('ea',av.ea);setAvail('dev',av.dev);setAvail('temp',av.temp);
   setAvail('tnom',av.tnom);setAvail('uc',av.uc);setAvail('mes',av.mes);
+  Object.entries(_searchTerms).forEach(([lid,term])=>{if(term) applySearchFilter(lid,term);});
 }
 
 function setAvail(k,set){
