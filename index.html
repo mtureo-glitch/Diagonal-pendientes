@@ -4,28 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Diagonal de Pendientes — CEMA Arauco</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif;}
 body{background:#ddd;font-size:12px;color:#1a1a1a;overflow:hidden;height:100vh;}
 .app{display:grid;grid-template-columns:1fr 230px;grid-template-rows:auto 1fr auto;height:100vh;}
-
-/* HEADER — ocupa toda la fila superior */
-.hdr{grid-column:1/3;background:#fff;padding:8px 14px;display:flex;align-items:center;gap:14px;border-bottom:1px solid #bbb;}
-.btn-clear{border:1px solid #888;background:#fff;padding:4px 12px;border-radius:3px;cursor:pointer;font-size:11px;}
-.btn-excel{border:1px solid #1a6b1a;background:#e8f4e8;color:#1a6b1a;padding:4px 12px;border-radius:3px;cursor:pointer;font-size:11px;font-weight:600;}
-.btn-excel:hover{background:#27ae60;color:#fff;}
-.btn-clear:hover{background:#f5f5f5;}
-.hdr-title{font-size:14px;font-weight:400;letter-spacing:1.5px;flex:1;text-align:center;color:#333;line-height:1.6;}
-.logo{font-size:28px;font-weight:900;letter-spacing:2px;color:#695F58;}
-
-/* TABLE AREA */
+.hdr{grid-column:1/3;background:#695F58;padding:8px 14px;display:flex;align-items:center;gap:14px;border-bottom:1px solid #4a3f39;}
+.btn-clear{border:1px solid rgba(255,255,255,0.5);background:transparent;color:#fff;padding:4px 12px;border-radius:3px;cursor:pointer;font-size:11px;}
+.btn-clear:hover{background:rgba(255,255,255,0.15);}
+.btn-excel{border:1px solid #BFB800;background:transparent;color:#BFB800;padding:4px 12px;border-radius:3px;cursor:pointer;font-size:11px;font-weight:600;}
+.btn-excel:hover{background:#BFB800;color:#3a3200;}
+.hdr-title{font-size:14px;font-weight:400;letter-spacing:1.5px;flex:1;text-align:center;color:#fff;line-height:1.6;}
+.hdr-title small{font-size:10px;color:rgba(255,255,255,0.7);display:block;}
+.logo{font-size:26px;font-weight:900;letter-spacing:2px;color:#fff;}
 .tbl-area{display:flex;flex-direction:column;overflow:hidden;background:#e0ddd8;}
 .tbl-scroll{flex:1;overflow:auto;background:#fff;border:1px solid #ccc;margin:4px 0 0 4px;}
 table{width:100%;border-collapse:collapse;font-size:11px;}
 thead{position:sticky;top:0;z-index:3;background:#fff;}
-thead th{padding:5px 8px;text-align:left;font-weight:600;font-size:10px;color:#333;
-  white-space:nowrap;cursor:pointer;user-select:none;
-  border-bottom:2px solid #aaa;border-right:1px solid #ddd;}
+thead th{padding:5px 8px;text-align:left;font-weight:600;font-size:10px;color:#333;white-space:nowrap;cursor:pointer;user-select:none;border-bottom:2px solid #aaa;border-right:1px solid #ddd;}
 thead th:hover{background:#f0eeeb;}
 thead th.asc::after{content:" ▲";font-size:8px;}
 thead th.desc::after{content:" ▼";font-size:8px;}
@@ -33,69 +29,51 @@ tbody tr{border-bottom:1px solid #eee;}
 tbody tr:hover{background:#f7f5f2;}
 tbody td{padding:4px 8px;border-right:1px solid #f0f0f0;}
 td.right{text-align:right;font-weight:600;}
-.tfoot-row td{padding:5px 8px;font-weight:700;background:#fff;border-top:2px solid #555;position:sticky;bottom:0;}
+.tfoot-row td{padding:5px 8px;font-weight:700;background:#BFB800;color:#3a3200;border-top:2px solid #695F58;position:sticky;bottom:0;}
 td.right-foot{text-align:right;font-weight:700;}
 .eq-plan{color:#1a5fa8;font-weight:700;}
 .eq-acta{color:#cc3300;font-weight:700;}
 .eq-match{color:#cc6600;font-weight:700;}
-.dot{display:inline-block;width:13px;height:13px;border-radius:50%;vertical-align:middle;border:1px solid rgba(0,0,0,0.15);}
+.dot{display:inline-block;width:13px;height:13px;border-radius:50%;vertical-align:middle;border:1px solid rgba(0,0,0,0.2);}
 .dot-r{background:#e74c3c;}.dot-a{background:#f39c12;}.dot-v{background:#27ae60;}.dot-x{background:#ccc;}
-.badge{display:inline-block;padding:1px 6px;border-radius:3px;font-size:9px;font-weight:700;}
-.badge-cema{background:#e8f4e8;color:#1a6b1a;}.badge-cima{background:#e8eef8;color:#1a3a8f;}
-.pager{display:flex;align-items:center;gap:8px;padding:4px 8px;background:#fff;
-       border-top:1px solid #ccc;margin-left:4px;font-size:10px;color:#555;}
+.pager{display:flex;align-items:center;gap:8px;padding:4px 8px;background:#fff;border-top:1px solid #ccc;margin-left:4px;font-size:10px;color:#555;}
 .pager button{border:1px solid #ccc;background:#fff;padding:2px 8px;border-radius:3px;cursor:pointer;font-size:10px;}
 .pager button:disabled{opacity:0.3;cursor:default;}
-
-/* RIGHT PANEL — todos los filtros aquí, sin duplicados */
-.rpanel{background:#e0ddd8;overflow-y:scroll;padding:4px;display:flex;flex-direction:column;gap:3px;border-left:1px solid #ccc;height:100%;overscroll-behavior:contain;}
+.rpanel{background:#e0ddd8;overflow-y:scroll;padding:4px;display:flex;flex-direction:column;gap:3px;border-left:1px solid #ccc;overscroll-behavior:contain;}
 .fbox{background:#fff;border:1px solid #ccc;overflow:hidden;border-radius:2px;flex-shrink:0;}
-.fhdr{background:#BFB800;color:#3a3200;padding:3px 8px;font-weight:700;font-size:9px;
-      letter-spacing:0.5px;text-transform:uppercase;}
-.flist{max-height:180px;overflow-y:auto;overscroll-behavior:contain;}
+.fhdr{background:#BFB800;color:#3a3200;padding:3px 8px;font-weight:700;font-size:9px;letter-spacing:0.5px;text-transform:uppercase;}
+.flist{max-height:140px;overflow-y:auto;overscroll-behavior:contain;}
 .fi{display:flex;align-items:center;gap:5px;padding:2px 7px;cursor:pointer;}
 .fi:hover{background:#f8f6f2;}
 .fi input{cursor:pointer;accent-color:#695F58;width:12px;height:12px;flex-shrink:0;}
-.fi label{cursor:pointer;font-size:10px;white-space:nowrap;overflow:hidden;
-          text-overflow:ellipsis;color:#333;line-height:1.4;}
-.fi .dot{width:10px;height:10px;}
-.searchbox{width:100%;border:none;border-bottom:1px solid #ddd;padding:3px 7px;
-           font-size:9px;outline:none;background:#fafafa;}
-
-
-/* BOTTOM BAR */
-.bottom-bar{grid-column:1/3;background:#e0ddd8;border-top:2px solid #BFB800;
-  padding:4px 6px;display:flex;gap:6px;overflow-x:auto;flex-shrink:0;min-height:0;}
-.bbox{border:1px solid #ccc;min-width:100px;flex:0 0 auto;overflow:hidden;background:#fff;border-radius:2px;}
-.bhdr{background:#BFB800;color:#3a3200;padding:2px 7px;font-weight:700;font-size:9px;
-      text-transform:uppercase;letter-spacing:0.4px;}
-.blist{max-height:68px;overflow-y:auto;}
+.fi label{cursor:pointer;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#333;line-height:1.4;}
+.searchbox{width:100%;border:none;border-bottom:1px solid #ddd;padding:3px 7px;font-size:9px;outline:none;background:#fafafa;}
+.bottom-bar{grid-column:1/3;background:#e0ddd8;border-top:2px solid #BFB800;padding:3px 4px;display:flex;gap:4px;overflow-x:auto;flex-shrink:0;}
+.bbox{border:1px solid #ccc;min-width:90px;flex:0 0 auto;overflow:hidden;background:#fff;border-radius:2px;}
+.bhdr{background:#BFB800;color:#3a3200;padding:2px 6px;font-weight:700;font-size:9px;text-transform:uppercase;letter-spacing:0.4px;}
+.blist{max-height:65px;overflow-y:auto;}
 .bi{display:flex;align-items:center;gap:4px;padding:2px 6px;cursor:pointer;}
 .bi:hover{background:#f8f6f2;}
 .bi input{cursor:pointer;accent-color:#695F58;width:11px;height:11px;flex-shrink:0;}
-.bi label{cursor:pointer;font-size:9px;color:#333;white-space:nowrap;}
+.bi label{cursor:pointer;font-size:9px;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .bi .dot{width:10px;height:10px;}
-
-/* Separador entre grupo izq y grupo der en bottom-bar */
-.bottom-bar .sep{width:1px;background:#BFB800;flex-shrink:0;margin:0 4px;}
 ::-webkit-scrollbar{width:5px;height:5px;}
-::-webkit-scrollbar-track{background:#e0ddd8;}
 ::-webkit-scrollbar-thumb{background:#bbb;border-radius:3px;}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 <div class="app">
 
-<!-- HEADER -->
 <div class="hdr">
   <button class="btn-clear" onclick="clearFilters()">Quitar Filtros</button>
-  <div class="hdr-title">DIAGONAL DE PENDIENTES<br><span id="last-update" style="font-size:10px;font-weight:400;color:rgba(255,255,255,0.7);letter-spacing:0.5px;">Cargando...</span></div>
-  <button class="btn-excel" onclick="exportExcel()" title="Descargar Excel">⬇ Excel</button>
+  <div class="hdr-title">
+    DIAGONAL DE PENDIENTES
+    <small id="last-update">Última actualización: 15/07/2026 13:49 hrs</small>
+  </div>
+  <button class="btn-excel" onclick="exportExcel()">⬇ Excel</button>
   <div class="logo">arauco</div>
 </div>
 
-<!-- TABLE AREA -->
 <div class="tbl-area">
   <div class="tbl-scroll">
     <table>
@@ -108,17 +86,16 @@ td.right-foot{text-align:right;font-weight:700;}
         <th onclick="sb(5)">ESCENARIO</th>
         <th onclick="sb(6)">EQUIPO ARCGIS</th>
         <th onclick="sb(7)">EQUIPO ACTA</th>
-          <th onclick="sb(13)">PENDIENTE</th>
-        <th onclick="sb(8)" style="text-align:center;">DESVIO</th>
-        <th onclick="sb(9)">TEAM</th>
-        <th onclick="sb(10)">EQUIPO</th>
-        <th onclick="sb(11)" style="text-align:right;">VOLUMEN M3SSC</th>
+        <th onclick="sb(8)">PENDIENTE</th>
+        <th onclick="sb(9)" style="text-align:center;">DESVIO</th>
+        <th onclick="sb(10)">TEAM</th>
+        <th onclick="sb(11)">EQUIPO</th>
+        <th onclick="sb(12)" style="text-align:right;">VOLUMEN M3SSC</th>
       </tr></thead>
       <tbody id="tbody"></tbody>
       <tfoot><tr class="tfoot-row">
         <td colspan="12" id="tfl">Total</td>
         <td class="right-foot" id="tfv"></td>
-        <td></td>
       </tr></tfoot>
     </table>
   </div>
@@ -130,99 +107,81 @@ td.right-foot{text-align:right;font-weight:700;}
   </div>
 </div>
 
-<!-- RIGHT PANEL — único panel de filtros, sin duplicados -->
 <div class="rpanel">
   <div class="fbox"><div class="fhdr">MES</div><div class="flist" id="fm"></div></div>
   <div class="fbox"><div class="fhdr">NOMBRE EMPRESARIO</div><div class="flist" id="fe"></div></div>
   <div class="fbox">
     <div class="fhdr">TEAM</div>
-    <input class="searchbox" placeholder="Buscar..." oninput="filterSearch(this,'ftn')">
+    <input class="searchbox" id="sb-ftn" placeholder="Buscar...">
     <div class="flist" id="ftn"></div>
   </div>
-  </div>
+  <div class="fbox"><div class="fhdr">EQUIPO ARCGIS</div><div class="flist" id="fep"></div></div>
+  <div class="fbox"><div class="fhdr">ESTADO PLAN</div><div class="flist" id="fsp"></div></div>
+  <div class="fbox"><div class="fhdr">ESTADO AVANCE</div><div class="flist" id="fea"></div></div>
+  <div class="fbox"><div class="fhdr">INTERVENCIÓN</div><div class="flist" id="fin"></div></div>
+</div>
 
-
-<!-- BOTTOM BAR: filtros secundarios -->
 <div class="bottom-bar">
-  <div class="bbox sbox-sm">
-    <div class="bhdr">UNIDAD OP.</div>
-    <div class="blist" id="fuo"></div>
-  </div>
-  <div class="bbox sbox-sm">
-    <div class="bhdr">UNIDAD</div>
-    <div class="blist" id="fuc"></div>
-  </div>
-  <div class="bbox sbox-sm">
-    <div class="bhdr">ZONA</div>
-    <div class="blist" id="fzona"></div>
-  </div>
-  <div class="bbox" style="min-width:130px;">
+  <div class="bbox" style="min-width:80px;"><div class="bhdr">UNIDAD OP.</div><div class="blist" id="buo"></div></div>
+  <div class="bbox" style="min-width:75px;"><div class="bhdr">UNIDAD</div><div class="blist" id="buc"></div></div>
+  <div class="bbox" style="min-width:90px;"><div class="bhdr">ZONA</div><div class="blist" id="bzona"></div></div>
+  <div class="bbox" style="min-width:140px;">
     <div class="bhdr">ORIGEN</div>
-    <input class="searchbox" placeholder="Buscar..." oninput="filterSearch(this,'forigen')">
-    <div class="blist" id="forigen"></div>
+    <input class="searchbox" id="sb-borigen" placeholder="Buscar...">
+    <div class="blist" id="borigen"></div>
   </div>
   <div class="bbox" style="min-width:110px;">
     <div class="bhdr">ACTA</div>
-    <input class="searchbox" placeholder="Buscar..." oninput="filterSearch(this,'facta')">
-    <div class="blist" id="facta"></div>
+    <input class="searchbox" id="sb-bacta" placeholder="Buscar...">
+    <div class="blist" id="bacta"></div>
   </div>
-
-  <div class="sep"></div>
-  <div class="bbox">
-    <div class="bhdr">ESTADO PLAN</div>
-    <div class="blist" id="fsp"></div>
-  </div>
-  <div class="bbox">
-    <div class="bhdr">ESTADO AVANCE</div>
-    <div class="blist" id="fea"></div>
-  </div>
-  <div class="bbox" style="min-width:130px;">
-    <div class="bhdr">TEMPORADA</div>
-    <div class="blist" id="ftemp"></div>
-  </div>
-  <div class="bbox">
-    <div class="bhdr">INTERVENCIÓN</div>
-    <div class="blist" id="fin"></div>
-  </div>
-  <div class="bbox" style="min-width:90px;">
-    <div class="bhdr">DESVIO</div>
-    <div class="blist" id="fdev"></div>
-  </div>
-  <div class="bbox sbox-md">
-    <div class="bhdr">EQUIPO ARCGIS</div>
-    <div class="blist" id="fep"></div>
-  </div>
+  <div class="bbox" style="min-width:85px;"><div class="bhdr">ESTADO PLAN</div><div class="blist" id="bsp"></div></div>
+  <div class="bbox" style="min-width:90px;"><div class="bhdr">EST. AVANCE</div><div class="blist" id="bea"></div></div>
+  <div class="bbox" style="min-width:120px;"><div class="bhdr">TEMPORADA</div><div class="blist" id="btemp"></div></div>
+  <div class="bbox" style="min-width:100px;"><div class="bhdr">INTERVENCIÓN</div><div class="blist" id="bin"></div></div>
+  <div class="bbox" style="min-width:80px;"><div class="bhdr">DESVIO</div><div class="blist" id="bdev"></div></div>
+  <div class="bbox" style="min-width:110px;"><div class="bhdr">EQUIPO ARCGIS</div><div class="blist" id="bep"></div></div>
 </div>
-</div><!-- .app -->
+
+</div>
 
 <script>
 (async function(){
 
-// Fecha embebida
-  const elFecha = document.getElementById('last-update');
-  if(elFecha) elFecha.textContent = 'Última actualización: 13/07/2026 08:28 hrs';
-  // Refinar con GitHub API
-  fetch('https://api.github.com/repos/mtureo-glitch/Diagonal-pendientes/commits?path=data.json&per_page=1&t='+Date.now())
-    .then(r=>r.json()).then(commits=>{
-      if(commits && commits[0] && commits[0].commit){
-        const f=new Date(commits[0].commit.author.date);
-        const fs=f.toLocaleString('es-CL',{timeZone:'America/Santiago',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false});
-        if(elFecha) elFecha.textContent='Última actualización: '+fs+' hrs';
-      }
-    }).catch(()=>{});
-  const D = await (await fetch('data.json')).json();
-const ROWS=D.rows.map(r=>({
-  zona:r[0]>=0?D.Z[r[0]]:'', emp:D.E[r[1]], idp:r[2], ori:D.P[r[3]],
-  acta:r[4], esc:r[5],
-  ep:r[6]>=0?D.EP[r[6]]:'', er:r[7]>=0?D.ER[r[7]]:'',
-  dev:r[8],
-  tnom:D.TN[r[10]], tcod:D.TC[r[9]], uc:D.UC[r[11]],
-  vol:r[12],
-  mes:r[13]>=0?D.MES[r[13]]:'Sin fecha',
-  sp:r[14]>=0?D.SP[r[14]]:'',
-  ea:r[15]>=0?D.EA[r[15]]:'',
-  uo:r[16]>=0?D.UO[r[16]]:'',
-  int:D.IN[r[17]], temp:r[18]>=0?D.TEMP[r[18]]:'', pend:r[19]>=0?D.PEND[r[19]]:''
+// Actualizar fecha desde GitHub API
+fetch('https://api.github.com/repos/mtureo-glitch/Diagonal-pendientes/commits?path=data.json&per_page=1&t='+Date.now())
+  .then(r=>r.json()).then(cs=>{
+    if(cs&&cs[0]&&cs[0].commit){
+      const f=new Date(cs[0].commit.author.date);
+      const fs=f.toLocaleString('es-CL',{timeZone:'America/Santiago',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false});
+      document.getElementById('last-update').textContent='Última actualización: '+fs+' hrs';
+    }
+  }).catch(()=>{});
+
+// Cargar datos
+const D = await fetch('data.json').then(r=>r.json());
+
+const ROWS = D.rows.map(r=>({
+  zona:  r[0]>=0?D.Z[r[0]]:'',
+  emp:   D.E[r[1]],
+  idp:   r[2],
+  ori:   D.P[r[3]],
+  acta:  r[4],
+  esc:   r[5],
+  ep:    r[6]>=0?D.EP[r[6]]:'',
+  er:    r[7]>=0?D.ER[r[7]]:'',
+  pend:  r[19]>=0?D.PEND[r[19]]:'',
+  dev:   r[8],
+  tcod:  D.TC[r[9]],
+  tnom:  D.TN[r[10]],
+  uc:    D.UC[r[11]],
+  vol:   r[12],
+  mes:   r[13]>=0?D.MES[r[13]]:'Sin fecha',
+  sp:    r[14]>=0?D.SP[r[14]]:'',
+  ea:    r[15]>=0?D.EA[r[15]]:'',
+  uo:    r[16]>=0?D.UO[r[16]]:'',
+  int_:  D.IN[r[17]],
+  temp:  r[18]>=0?D.TEMP[r[18]]:''
 }));
 
 const SEL={zona:new Set(),emp:new Set(),er:new Set(),int_:new Set(),
@@ -230,34 +189,34 @@ const SEL={zona:new Set(),emp:new Set(),er:new Set(),int_:new Set(),
            ep:new Set(),sp:new Set(),ea:new Set(),dev:new Set(),
            temp:new Set(),tnom:new Set(),uc:new Set()};
 
-let filtered=[...ROWS],sCol=4,sDir=1,page=0;
+let filtered=[...ROWS], sCol=4, sDir=1, page=0;
 const PAGE=150;
 
 function rowMatches(r,ex){
-  if(ex!=='zona' &&SEL.zona.size &&!SEL.zona.has(r.zona)) return false;
-  if(ex!=='emp'  &&SEL.emp.size  &&!SEL.emp.has(r.emp))  return false;
-  if(ex!=='er'   &&SEL.er.size   &&!SEL.er.has(r.er))    return false;
-  if(ex!=='int_' &&SEL.int_.size &&!SEL.int_.has(r.int)) return false;
-  if(ex!=='uo'   &&SEL.uo.size   &&!SEL.uo.has(r.uo))    return false;
-  if(ex!=='ori'  &&SEL.ori.size  &&!SEL.ori.has(r.ori))  return false;
-  if(ex!=='acta' &&SEL.acta.size &&!SEL.acta.has(String(r.acta))) return false;
-  if(ex!=='ep'   &&SEL.ep.size   &&!SEL.ep.has(r.ep))    return false;
-  if(ex!=='sp'   &&SEL.sp.size   &&!SEL.sp.has(r.sp))    return false;
-  if(ex!=='ea'   &&SEL.ea.size   &&!SEL.ea.has(r.ea))    return false;
-  if(ex!=='dev'  &&SEL.dev.size  &&!SEL.dev.has(String(r.dev))) return false;
-  if(ex!=='temp' &&SEL.temp.size &&!SEL.temp.has(r.temp)) return false;
-  if(ex!=='tnom' &&SEL.tnom.size &&!SEL.tnom.has(r.tnom)) return false;
-  if(ex!=='uc'   &&SEL.uc.size   &&!SEL.uc.has(r.uc))    return false;
-  if(ex!=='mes'  &&SEL.mes.size  &&!SEL.mes.has(r.mes))  return false;
+  if(ex!=='zona'&&SEL.zona.size&&!SEL.zona.has(r.zona))return false;
+  if(ex!=='emp' &&SEL.emp.size &&!SEL.emp.has(r.emp)) return false;
+  if(ex!=='er'  &&SEL.er.size  &&!SEL.er.has(r.er))  return false;
+  if(ex!=='int_'&&SEL.int_.size&&!SEL.int_.has(r.int_))return false;
+  if(ex!=='uo'  &&SEL.uo.size  &&!SEL.uo.has(r.uo))  return false;
+  if(ex!=='ori' &&SEL.ori.size &&!SEL.ori.has(r.ori)) return false;
+  if(ex!=='acta'&&SEL.acta.size&&!SEL.acta.has(String(r.acta)))return false;
+  if(ex!=='ep'  &&SEL.ep.size  &&!SEL.ep.has(r.ep))  return false;
+  if(ex!=='sp'  &&SEL.sp.size  &&!SEL.sp.has(r.sp))  return false;
+  if(ex!=='ea'  &&SEL.ea.size  &&!SEL.ea.has(r.ea))  return false;
+  if(ex!=='dev' &&SEL.dev.size &&!SEL.dev.has(String(r.dev)))return false;
+  if(ex!=='temp'&&SEL.temp.size&&!SEL.temp.has(r.temp))return false;
+  if(ex!=='tnom'&&SEL.tnom.size&&!SEL.tnom.has(r.tnom))return false;
+  if(ex!=='uc'  &&SEL.uc.size  &&!SEL.uc.has(r.uc))  return false;
+  if(ex!=='mes' &&SEL.mes.size &&!SEL.mes.has(r.mes)) return false;
   return true;
 }
 
 function applyFilters(){
   filtered=ROWS.filter(r=>rowMatches(r,null));
-  sortRows(); page=0; render(); refreshSlicerOptions();
+  sortRows(); page=0; render(); refreshOptions();
 }
 
-function refreshSlicerOptions(){
+function refreshOptions(){
   const av={zona:new Set(),emp:new Set(),er:new Set(),int_:new Set(),mes:new Set(),
             uo:new Set(),ori:new Set(),acta:new Set(),ep:new Set(),sp:new Set(),
             ea:new Set(),dev:new Set(),temp:new Set(),tnom:new Set(),uc:new Set()};
@@ -265,7 +224,7 @@ function refreshSlicerOptions(){
     if(rowMatches(r,'zona')) av.zona.add(r.zona);
     if(rowMatches(r,'emp'))  av.emp.add(r.emp);
     if(rowMatches(r,'er'))   av.er.add(r.er);
-    if(rowMatches(r,'int_')) av.int_.add(r.int);
+    if(rowMatches(r,'int_')) av.int_.add(r.int_);
     if(rowMatches(r,'uo'))   av.uo.add(r.uo);
     if(rowMatches(r,'ori'))  av.ori.add(r.ori);
     if(rowMatches(r,'acta')) av.acta.add(String(r.acta));
@@ -278,59 +237,64 @@ function refreshSlicerOptions(){
     if(rowMatches(r,'uc'))   av.uc.add(r.uc);
     if(rowMatches(r,'mes'))  av.mes.add(r.mes);
   });
-  setAvail('zona',av.zona);setAvail('emp',av.emp);setAvail('er',av.er);
-  setAvail('int_',av.int_);setAvail('uo',av.uo);setAvail('ori',av.ori);
-  setAvail('acta',av.acta);setAvail('ep',av.ep);setAvail('sp',av.sp);
-  setAvail('ea',av.ea);setAvail('dev',av.dev);setAvail('temp',av.temp);
-  setAvail('tnom',av.tnom);setAvail('uc',av.uc);setAvail('mes',av.mes);
-  Object.entries(_searchTerms).forEach(([lid,term])=>{if(term) applySearchFilter(lid,term);});
-}
-
-function setAvail(k,set){
-  document.querySelectorAll('[data-set="'+k+'"]').forEach(cb=>{
-    const ok=set.has(cb.dataset.val);
-    const wrap=cb.closest('.fi,.bi');
-    if(!ok&&!cb.checked){cb.disabled=true;if(wrap)wrap.style.opacity='0.35';}
-    else{cb.disabled=false;if(wrap)wrap.style.opacity='1';}
+  Object.keys(av).forEach(k=>setAvail(k,av[k]));
+  // Reaplicar búsquedas activas
+  document.querySelectorAll('.searchbox').forEach(inp=>{
+    if(inp.value.trim()) applySearch(inp);
   });
 }
 
-const DOT_HTML=['<span class="dot dot-r"></span>','<span class="dot dot-a"></span>','<span class="dot dot-v"></span>','<span class="dot dot-x"></span>'];
-function fmt(n){return n.toLocaleString('es-CL',{minimumFractionDigits:2,maximumFractionDigits:2});}
-function fmtN(n){return n.toLocaleString('es-CL');}
+function setAvail(k,avSet){
+  document.querySelectorAll('[data-set="'+k+'"]').forEach(cb=>{
+    const ok=avSet.has(cb.dataset.val);
+    const w=cb.closest('.fi,.bi');
+    if(!ok&&!cb.checked){cb.disabled=true; if(w)w.style.opacity='0.35';}
+    else{cb.disabled=false; if(w)w.style.opacity='1';}
+  });
+}
+
+function applySearch(inp){
+  const term=inp.value.toLowerCase().trim();
+  const listId=inp.dataset.list;
+  document.querySelectorAll('#'+listId+' .fi, #'+listId+' .bi').forEach(item=>{
+    item.style.display=(!term||(item.dataset.search||'').includes(term))?'flex':'none';
+  });
+}
+
+const DOT=['<span class="dot dot-r"></span>','<span class="dot dot-a"></span>','<span class="dot dot-v"></span>','<span class="dot dot-x"></span>'];
+const fmt=n=>n.toLocaleString('es-CL',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtN=n=>n.toLocaleString('es-CL');
 
 function sortRows(){
-  const keys=['zona','emp','idp','ori','acta','esc','ep','er','dev','tnom','tcod','vol','uc','pend'];
+  const keys=['zona','emp','idp','ori','acta','esc','ep','er','pend','dev','tnom','tcod','vol'];
   const k=keys[sCol];
   filtered.sort((a,b)=>{const av=a[k],bv=b[k];if(av<bv)return -sDir;if(av>bv)return sDir;return 0;});
 }
 function sb(c){
-  if(sCol===c)sDir=-sDir; else{sCol=c; sDir=c===11?-1:1;}
+  if(sCol===c)sDir=-sDir; else{sCol=c;sDir=c===12?-1:1;}
   document.querySelectorAll('#ths th').forEach((th,i)=>{th.className=i===sCol?(sDir===1?'asc':'desc'):'';});
   sortRows(); render();
 }
 
 function render(){
-  const s=page*PAGE, e=Math.min(s+PAGE,filtered.length);
+  const s=page*PAGE,e=Math.min(s+PAGE,filtered.length);
   const tot=filtered.reduce((a,r)=>a+r.vol,0);
   document.getElementById('tbody').innerHTML=filtered.slice(s,e).map(r=>`<tr>
     <td><b>${r.zona}</b></td>
     <td title="${r.emp}">${r.emp.length>26?r.emp.slice(0,24)+'…':r.emp}</td>
     <td>${r.idp||''}</td>
     <td title="${r.ori}">${r.ori.length>22?r.ori.slice(0,20)+'…':r.ori}</td>
-    <td>${r.acta}</td>
-    <td>${r.esc||''}</td>
+    <td>${r.acta}</td><td>${r.esc||''}</td>
     <td class="eq-plan">${r.ep}</td>
     <td class="${r.dev===1?'eq-match':'eq-acta'}">${r.er}</td>
     <td>${r.pend}</td>
-    <td style="text-align:center">${DOT_HTML[r.dev]||DOT_HTML[3]}</td>
-    <td>${r.tnom}</td>
-    <td>${r.tcod}</td>
+    <td style="text-align:center">${DOT[r.dev]||DOT[3]}</td>
+    <td>${r.tnom}</td><td>${r.tcod}</td>
     <td class="right">${fmt(r.vol)}</td>
   </tr>`).join('');
   document.getElementById('tfl').innerHTML='<b>Total</b>';
   document.getElementById('tfv').textContent=fmt(tot);
-  document.getElementById('pi2').textContent=`Pág. ${page+1} / ${Math.ceil(filtered.length/PAGE)||1}`;
+  document.getElementById('pi2').textContent=`Pág. ${page+1}/${Math.ceil(filtered.length/PAGE)||1}`;
   document.getElementById('ri').textContent=`${fmtN(s+1)}–${fmtN(e)} de ${fmtN(filtered.length)}`;
   document.getElementById('pp').disabled=page===0;
   document.getElementById('pn').disabled=e>=filtered.length;
@@ -338,68 +302,72 @@ function render(){
 function prevPage(){if(page>0){page--;render();}}
 function nextPage(){if((page+1)*PAGE<filtered.length){page++;render();}}
 
-// filterSearch definida más abajo
+function tog(set,val,on){if(on)set.add(val);else set.delete(val);}
 
-function mkListB(id,vals,setKey,handler){
-  const el=document.getElementById(id);
-  if(!el) return;
-  el.innerHTML=vals.map((v,i)=>`<div class="bi" data-search="${String(v).toLowerCase()}">
-    <input type="checkbox" id="cb_${id}_${i}" data-set="${setKey}" data-val="${String(v).replace(/"/g,'&quot;')}">
-    <label for="cb_${id}_${i}">${v}</label></div>`).join('');
+// Buscadores con data-list apuntando al id de la lista
+['sb-ftn','sb-borigen','sb-bacta'].forEach(id=>{
+  const inp=document.getElementById(id);
+  if(!inp)return;
+  inp.addEventListener('input',()=>applySearch(inp));
+});
+
+function mkItems(listId,vals,setKey,set,cls='fi'){
+  const el=document.getElementById(listId);
+  if(!el)return;
+  el.innerHTML=vals.map((v,i)=>`<div class="${cls}" data-search="${String(v).toLowerCase()}">
+    <input type="checkbox" id="c_${listId}_${i}" data-set="${setKey}" data-val="${String(v).replace(/"/g,'&quot;')}">
+    <label for="c_${listId}_${i}">${v}</label></div>`).join('');
   el.querySelectorAll('input').forEach(cb=>cb.addEventListener('change',function(){
-    handler(this.dataset.val,this.checked);
+    tog(set,this.dataset.val,this.checked);
+    // Sync gemelos
+    document.querySelectorAll('[data-set="'+setKey+'"][data-val="'+CSS.escape(this.dataset.val)+'"]').forEach(t=>{if(t!==this)t.checked=this.checked;});
+    applyFilters();
   }));
 }
-const _searchTerms={};
-function filterSearch(inp,listId){
-  const term=inp.value.toLowerCase();
-  _searchTerms[listId]=term;
-  applySearchFilter(listId,term);
-}
-function applySearchFilter(listId,term){
-  if(!term) return;
-  document.querySelectorAll('#'+listId+' .fi, #'+listId+' .bi').forEach(item=>{
-    item.style.display=(item.dataset.search||'').includes(term)?'flex':'none';
-  });
-}
-function mkList(id,vals,setKey,handler){
-  const el=document.getElementById(id);
-  el.innerHTML=vals.map((v,i)=>`<div class="fi" data-search="${String(v).toLowerCase()}">
-    <input type="checkbox" id="c_${id}_${i}" data-set="${setKey}" data-val="${String(v).replace(/"/g,'&quot;')}">
-    <label for="c_${id}_${i}">${v}</label></div>`).join('');
-  el.querySelectorAll('input').forEach(cb=>cb.addEventListener('change',function(){
-    handler(this.dataset.val,this.checked);
-  }));
-}
-function tog(set,val,on){if(on)set.add(val); else set.delete(val);}
 
-// Todos los filtros en el panel derecho — sin duplicados
-mkList('fm',D.MES,'mes',(val,on)=>{tog(SEL.mes,val,on);applyFilters();});
-mkList('fe',D.E,'emp',(val,on)=>{tog(SEL.emp,val,on);applyFilters();});
-mkList('ftn',D.TN.slice().sort((a,b)=>a.localeCompare(b)),'tnom',(val,on)=>{tog(SEL.tnom,val,on);applyFilters();});
-mkListB('fsp',D.SP,'sp',(val,on)=>{tog(SEL.sp,val,on);applyFilters();});
-mkListB('fea',D.EA,'ea',(val,on)=>{tog(SEL.ea,val,on);applyFilters();});
-mkListB('ftemp',D.TEMP,'temp',(val,on)=>{tog(SEL.temp,val,on);applyFilters();});
-mkListB('fin',D.IN,'int_',(val,on)=>{tog(SEL.int_,val,on);applyFilters();});
+const MESES_ORD=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const mesesDisp=MESES_ORD.filter(m=>D.MES.includes(m));
 
-// Desvío con puntos de color
-mkListB('fuo',D.UO,'uo',(val,on)=>{tog(SEL.uo,val,on);applyFilters();});
-mkListB('fuc',D.UC,'uc',(val,on)=>{tog(SEL.uc,val,on);applyFilters();});
-mkListB('fzona',D.Z,'zona',(val,on)=>{tog(SEL.zona,val,on);applyFilters();});
+// Panel derecho
+mkItems('fm',mesesDisp,'mes',SEL.mes);
+mkItems('fe',D.E,'emp',SEL.emp);
+mkItems('ftn',D.TN.slice().sort((a,b)=>a.localeCompare(b)),'tnom',SEL.tnom);
+document.getElementById('sb-ftn').dataset.list='ftn';
+mkItems('fep',D.EP,'ep',SEL.ep);
+mkItems('fsp',D.SP,'sp',SEL.sp);
+mkItems('fea',D.EA,'ea',SEL.ea);
+mkItems('fin',D.IN,'int_',SEL.int_);
+
+// Barra inferior
+mkItems('buo',D.UO,'uo',SEL.uo,'bi');
+mkItems('buc',D.UC,'uc',SEL.uc,'bi');
+mkItems('bzona',D.Z,'zona',SEL.zona,'bi');
+
 const oriFreq={};ROWS.forEach(r=>{oriFreq[r.ori]=(oriFreq[r.ori]||0)+1;});
 const allOri=Object.entries(oriFreq).sort((a,b)=>b[1]-a[1]).map(e=>e[0]);
-mkListB('forigen',allOri,'ori',(val,on)=>{tog(SEL.ori,val,on);applyFilters();});
+mkItems('borigen',allOri,'ori',SEL.ori,'bi');
+document.getElementById('sb-borigen').dataset.list='borigen';
+
 const actaFreq={};ROWS.forEach(r=>{actaFreq[r.acta]=(actaFreq[r.acta]||0)+1;});
 const allActa=Object.entries(actaFreq).sort((a,b)=>b[1]-a[1]).map(e=>String(e[0]));
-mkListB('facta',allActa,'acta',(val,on)=>{tog(SEL.acta,val,on);applyFilters();});
-mkListB('fep',D.EP,'ep',(val,on)=>{tog(SEL.ep,val,on);applyFilters();});
-document.getElementById('fdev').innerHTML=
-  [['0','dot-r','ROJO'],['1','dot-a','AMARILLO'],['2','dot-v','VERDE']].map(([dv,dc,lbl],i)=>
-    `<div class="bi"><input type="checkbox" id="cd${i}" data-set="dev" data-val="${dv}">
-     <label for="cd${i}"><span class="dot ${dc}"></span> ${lbl}</label></div>`).join('');
-document.querySelectorAll('#fdev input').forEach(cb=>cb.addEventListener('change',function(){
+mkItems('bacta',allActa,'acta',SEL.acta,'bi');
+document.getElementById('sb-bacta').dataset.list='bacta';
+
+mkItems('bsp',D.SP,'sp',SEL.sp,'bi');
+mkItems('bea',D.EA,'ea',SEL.ea,'bi');
+mkItems('btemp',D.TEMP,'temp',SEL.temp,'bi');
+mkItems('bin',D.IN,'int_',SEL.int_,'bi');
+
+// Desvio
+document.getElementById('bdev').innerHTML=
+  [['0','dot-r','ROJO'],['1','dot-a','AMARILLO'],['2','dot-v','VERDE']].map(([dv,dc,lb],i)=>
+    `<div class="bi"><input type="checkbox" id="bdev${i}" data-set="dev" data-val="${dv}">
+     <label for="bdev${i}"><span class="dot ${dc}"></span> ${lb}</label></div>`).join('');
+document.querySelectorAll('#bdev input').forEach(cb=>cb.addEventListener('change',function(){
   tog(SEL.dev,this.dataset.val,this.checked); applyFilters();
 }));
+
+mkItems('bep',D.EP,'ep',SEL.ep,'bi');
 
 function clearFilters(){
   Object.values(SEL).forEach(s=>s.clear());
@@ -407,53 +375,30 @@ function clearFilters(){
     cb.checked=false; cb.disabled=false;
     const w=cb.closest('.fi,.bi'); if(w){w.style.opacity='1'; w.style.display='flex';}
   });
-  document.querySelectorAll('.searchbox').forEach(sb=>sb.value='');
-  Object.keys(_searchTerms).forEach(k=>delete _searchTerms[k]);
-  document.querySelectorAll('.fi,.bi').forEach(fi=>fi.style.display='flex');
-  document.querySelectorAll('.fi,.bi').forEach(fi=>fi.style.display='flex');
+  document.querySelectorAll('.searchbox').forEach(inp=>{
+    inp.value='';
+    const lid=inp.dataset.list;
+    if(lid) document.querySelectorAll('#'+lid+' .fi, #'+lid+' .bi').forEach(item=>item.style.display='flex');
+  });
   applyFilters();
 }
 
-sb(4); refreshSlicerOptions();
-
 function exportExcel(){
-  // Encabezados
-  const headers = ['ZONA','NOMBRE EMPRESARIO','IDPREDIO','ORIGEN','NUMERO ACTA',
-    'ESCENARIO','EQUIPO ARCGIS','EQUIPO ACTA','PENDIENTE','DESVIO','TEAM','EQUIPO',
-    'VOLUMEN M3SSC','MES'];
-
-  // Usar filtered (filas actualmente filtradas)
-  const desvLabel = ['ROJO','AMARILLO','VERDE','SIN DATO'];
-  const rows = filtered.map(r=>[
-    r.zona, r.emp, r.idp, r.ori, r.acta,
-    r.esc, r.ep, r.er, r.pend,
-    desvLabel[r.dev]||'', r.tnom, r.tcod,
-    r.vol, r.mes
-  ]);
-
-  // Total row
-  const total = filtered.reduce((s,r)=>s+r.vol,0);
-  const totalRow = ['Total','','','','','','','','','','','',
-    Math.round(total*100)/100,''];
-
-  const wsData = [headers, ...rows, totalRow];
-  const ws = XLSX.utils.aoa_to_sheet(wsData);
-
-  // Estilo de anchos de columna
-  ws['!cols'] = [
-    {wch:14},{wch:28},{wch:10},{wch:22},{wch:12},
-    {wch:10},{wch:16},{wch:12},{wch:18},{wch:10},
-    {wch:18},{wch:10},{wch:16},{wch:10}
-  ];
-
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Diagonal de Pendientes');
-
-  // Nombre archivo con fecha
-  const hoy = new Date();
-  const fecha = hoy.getFullYear()+'-'+String(hoy.getMonth()+1).padStart(2,'0')+'-'+String(hoy.getDate()).padStart(2,'0');
-  XLSX.writeFile(wb, 'Diagonal_Pendientes_'+fecha+'.xlsx');
+  const headers=['ZONA','NOMBRE EMPRESARIO','IDPREDIO','ORIGEN','NUMERO ACTA','ESCENARIO',
+    'EQUIPO ARCGIS','EQUIPO ACTA','PENDIENTE','DESVIO','TEAM','EQUIPO','VOLUMEN M3SSC','MES'];
+  const devL=['ROJO','AMARILLO','VERDE','SIN DATO'];
+  const rows=filtered.map(r=>[r.zona,r.emp,r.idp,r.ori,r.acta,r.esc,r.ep,r.er,r.pend,
+    devL[r.dev]||'',r.tnom,r.tcod,r.vol,r.mes]);
+  const tot=filtered.reduce((s,r)=>s+r.vol,0);
+  const ws=XLSX.utils.aoa_to_sheet([headers,...rows,['Total','','','','','','','','','','','',Math.round(tot*100)/100,'']]);
+  ws['!cols']=[{wch:14},{wch:28},{wch:10},{wch:22},{wch:12},{wch:10},{wch:16},{wch:12},{wch:18},{wch:10},{wch:18},{wch:10},{wch:16},{wch:10}];
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Diagonal de Pendientes');
+  const hoy=new Date(); const fecha=hoy.getFullYear()+'-'+String(hoy.getMonth()+1).padStart(2,'0')+'-'+String(hoy.getDate()).padStart(2,'0');
+  XLSX.writeFile(wb,'Diagonal_Pendientes_'+fecha+'.xlsx');
 }
+
+sb(4); refreshOptions();
 
 })();
 </script>
