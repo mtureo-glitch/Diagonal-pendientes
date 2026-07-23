@@ -68,7 +68,7 @@ td.right-foot{text-align:right;font-weight:700;}
   <button class="btn-clear" onclick="clearFilters()">Quitar Filtros</button>
   <div class="hdr-title">
     DIAGONAL DE PENDIENTES
-    <small id="last-update">Última actualización: 20/07/2026 09:32 hrs</small>
+    <small id="last-update">Última actualización: 23/07/2026 15:13 hrs</small>
   </div>
   <button class="btn-excel" onclick="exportExcel()">⬇ Excel</button>
   <div class="logo">arauco</div>
@@ -116,6 +116,7 @@ td.right-foot{text-align:right;font-weight:700;}
     <div class="flist" id="ftn"></div>
   </div>
   <div class="fbox"><div class="fhdr">EQUIPO ARCGIS</div><div class="flist" id="fep"></div></div>
+  <div class="fbox"><div class="fhdr">PENDIENTE</div><div class="flist" id="fpend"></div></div>
   <div class="fbox"><div class="fhdr">ESTADO PLAN</div><div class="flist" id="fsp"></div></div>
   <div class="fbox"><div class="fhdr">ESTADO AVANCE</div><div class="flist" id="fea"></div></div>
   <div class="fbox"><div class="fhdr">INTERVENCIÓN</div><div class="flist" id="fin"></div></div>
@@ -141,6 +142,7 @@ td.right-foot{text-align:right;font-weight:700;}
   <div class="bbox" style="min-width:100px;"><div class="bhdr">INTERVENCIÓN</div><div class="blist" id="bin"></div></div>
   <div class="bbox" style="min-width:80px;"><div class="bhdr">DESVIO</div><div class="blist" id="bdev"></div></div>
   <div class="bbox" style="min-width:110px;"><div class="bhdr">EQUIPO ARCGIS</div><div class="blist" id="bep"></div></div>
+  <div class="bbox" style="min-width:130px;"><div class="bhdr">PENDIENTE</div><div class="blist" id="bpend"></div></div>
 </div>
 
 </div>
@@ -187,7 +189,7 @@ const ROWS = D.rows.map(r=>({
 const SEL={zona:new Set(),emp:new Set(),er:new Set(),int_:new Set(),
            mes:new Set(),uo:new Set(),ori:new Set(),acta:new Set(),
            ep:new Set(),sp:new Set(),ea:new Set(),dev:new Set(),
-           temp:new Set(),tnom:new Set(),uc:new Set()};
+           temp:new Set(),tnom:new Set(),uc:new Set(),pend:new Set()};
 
 let filtered=[...ROWS], sCol=4, sDir=1, page=0;
 const PAGE=150;
@@ -207,6 +209,7 @@ function rowMatches(r,ex){
   if(ex!=='temp'&&SEL.temp.size&&!SEL.temp.has(r.temp))return false;
   if(ex!=='tnom'&&SEL.tnom.size&&!SEL.tnom.has(r.tnom))return false;
   if(ex!=='uc'  &&SEL.uc.size  &&!SEL.uc.has(r.uc))  return false;
+  if(ex!=='pend'&&SEL.pend.size&&!SEL.pend.has(r.pend))return false;
   if(ex!=='mes' &&SEL.mes.size &&!SEL.mes.has(r.mes)) return false;
   return true;
 }
@@ -235,6 +238,7 @@ function refreshOptions(){
     if(rowMatches(r,'temp')) av.temp.add(r.temp);
     if(rowMatches(r,'tnom')) av.tnom.add(r.tnom);
     if(rowMatches(r,'uc'))   av.uc.add(r.uc);
+    if(rowMatches(r,'pend')) av.pend.add(r.pend);
     if(rowMatches(r,'mes'))  av.mes.add(r.mes);
   });
   Object.keys(av).forEach(k=>setAvail(k,av[k]));
@@ -368,6 +372,9 @@ document.querySelectorAll('#bdev input').forEach(cb=>cb.addEventListener('change
 }));
 
 mkItems('bep',D.EP,'ep',SEL.ep,'bi');
+
+mkItems('fpend',D.PEND,'pend',SEL.pend);
+mkItems('bpend',D.PEND,'pend',SEL.pend,'bi');
 
 function clearFilters(){
   Object.values(SEL).forEach(s=>s.clear());
