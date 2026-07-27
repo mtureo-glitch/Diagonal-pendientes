@@ -307,10 +307,20 @@ function renderAll(){
 
   ZONAS.forEach(zona=>{
     const zid=zona.replace(/[^a-z]/gi,'_');
-    const predios=getPredios(zona,filtered,devF).slice(0,15);
+    const allP=getPredios(zona,filtered,devF);
+    const predios=allP.filter(([,d])=>{
+      if(devF==='2') return d.verde>0;
+      if(devF==='0') return d.rojo>0;
+      return true;
+    }).slice(0,15);
     const volV=predios.reduce((s,[,d])=>s+d.verde,0);
     const volR=predios.reduce((s,[,d])=>s+d.rojo,0);
-    zoneCache[zona]={predios:getPredios(zona,filtered,devF), devF};
+    const allPredios=getPredios(zona,filtered,devF).filter(([,d])=>{
+      if(devF==='2') return d.verde>0;
+      if(devF==='0') return d.rojo>0;
+      return true;
+    });
+    zoneCache[zona]={predios:allPredios, devF};
 
     let card=document.getElementById('card-'+zid);
     if(!card){
