@@ -77,6 +77,14 @@ body{background:#f0efec;color:#1a1a1a;font-size:12px;overflow:hidden;height:100v
 </style>
 </head>
 <body>
+<script>
+// Acceso restringido
+if(window.location.hash !== '#arauco2026'){
+  document.addEventListener('DOMContentLoaded',()=>{
+    document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#f0efec;"><div style="text-align:center;color:#695F58;font-family:Segoe UI,Arial,sans-serif;"><div style="font-size:32px;font-weight:900;letter-spacing:2px;margin-bottom:12px;">arauco</div><p style="color:#aaa;font-size:13px;">Página no disponible</p><a href="index.html" style="color:#BFB800;font-size:12px;">← Volver al dashboard</a></div></div>';
+  });
+}
+</script>
 <div class="app">
   <div class="hdr">
     <a href="index.html" class="btn-nav">← Tabla</a>
