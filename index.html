@@ -426,6 +426,7 @@ document.querySelectorAll('[data-set="uc"]').forEach(cb=>{
 document.querySelectorAll('[data-set="uo"]').forEach(cb=>{
   if(cb.dataset.val==='COSECHA'){cb.checked=true;SEL.uo.add('COSECHA');}
 });
+applyFilters();
 sb(4); refreshOptions();
 
 })();
