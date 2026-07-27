@@ -53,6 +53,10 @@ body{background:#f0efec;color:#1a1a1a;font-size:12px;overflow:hidden;height:100v
 .modal-close:hover{background:rgba(255,255,255,0.2);}
 .modal-body{flex:1;padding:14px;overflow:hidden;position:relative;}
 .modal-chart-wrap{position:relative;height:100%;}
+
+#pend-dd label{display:flex;align-items:center;gap:6px;padding:4px 10px;font-size:10px;cursor:pointer;white-space:nowrap;}
+#pend-dd label:hover{background:#f5f3f0;}
+#pend-dd input{accent-color:#695F58;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -71,8 +75,20 @@ body{background:#f0efec;color:#1a1a1a;font-size:12px;overflow:hidden;height:100v
       <select id="f-mes" onchange="renderAll()"><option value="">Todos</option></select></div>
     <div class="fgrp"><label>TEAM</label>
       <select id="f-team" onchange="renderAll()"><option value="">Todos</option></select></div>
-    <div class="fgrp"><label>PENDIENTE</label>
-      <select id="f-pend" onchange="renderAll()"><option value="">Todos</option></select></div>
+    <div class="fgrp" style="position:relative;">
+      <label>PENDIENTE</label>
+      <div id="pend-btn" onclick="togglePendDD()" style="border:1px solid #ccc;border-radius:3px;padding:3px 22px 3px 6px;font-size:10px;background:#fff;color:#333;min-width:130px;cursor:pointer;position:relative;user-select:none;">
+        Todos
+        <span style="position:absolute;right:5px;top:50%;transform:translateY(-50%);font-size:8px;">▼</span>
+      </div>
+      <div id="pend-dd" style="display:none;position:absolute;top:100%;left:0;z-index:50;background:#fff;border:1px solid #ccc;border-radius:3px;min-width:160px;box-shadow:0 4px 12px rgba(0,0,0,0.15);padding:4px 0;">
+        <div style="padding:3px 8px;font-size:9px;color:#888;border-bottom:1px solid #eee;display:flex;justify-content:space-between;">
+          <span>Pendiente</span>
+          <span onclick="clearPend()" style="cursor:pointer;color:#695F58;font-weight:700;">Limpiar</span>
+        </div>
+        <div id="pend-items"></div>
+      </div>
+    </div>
     <div class="fgrp"><label>ESTADO PLAN</label>
       <select id="f-sp" onchange="renderAll()"><option value="">Todos</option></select></div>
     <div class="fgrp"><label>ESTADO</label>
@@ -130,23 +146,31 @@ function populate(id,vals){
 }
 populate('f-mes',MESES_ORD.filter(m=>ROWS.some(r=>r.mes===m)));
 populate('f-team',[...new Set(ROWS.map(r=>r.tnom))].sort((a,b)=>a.localeCompare(b)));
-populate('f-pend',[...new Set(ROWS.map(r=>r.pend).filter(Boolean))].sort());
+// Poblar multiselect pendiente
+const pendVals=[...new Set(ROWS.map(r=>r.pend).filter(Boolean))].sort();
+const pendItems=document.getElementById('pend-items');
+pendVals.forEach(v=>{
+  const lbl=document.createElement('label');
+  lbl.innerHTML=`<input type="checkbox" value="${v}" onchange="updatePendBtn();renderAll()"> ${v}`;
+  pendItems.appendChild(lbl);
+});
 populate('f-sp',[...new Set(ROWS.map(r=>r.sp).filter(Boolean))].sort());
 
 function getFiltered(){
   const mes=document.getElementById('f-mes').value,
         team=document.getElementById('f-team').value,
-        pend=document.getElementById('f-pend').value,
         sp=document.getElementById('f-sp').value,
         dev=document.getElementById('f-dev').value;
+  const selPends=new Set([...document.querySelectorAll('#pend-items input:checked')].map(c=>c.value));
   return ROWS.filter(r=>
     (!mes||r.mes===mes)&&(!team||r.tnom===team)&&
-    (!pend||r.pend===pend)&&(!sp||r.sp===sp)&&
+    (selPends.size===0||selPends.has(r.pend))&&(!sp||r.sp===sp)&&
     (dev===''||String(r.dev)===dev));
 }
 
 function clearFilters(){
-  ['f-mes','f-team','f-pend','f-sp','f-dev'].forEach(id=>document.getElementById(id).value='');
+  ['f-mes','f-team','f-sp','f-dev'].forEach(id=>document.getElementById(id).value='');
+  clearPend();
   renderAll();
 }
 
@@ -334,6 +358,28 @@ function closeModal(e){
 
 renderAll();
 window.renderAll=renderAll;
+
+// Dropdown multiselect pendiente
+function togglePendDD(){
+  const dd=document.getElementById('pend-dd');
+  dd.style.display=dd.style.display==='none'?'block':'none';
+}
+function updatePendBtn(){
+  const checked=[...document.querySelectorAll('#pend-items input:checked')].map(c=>c.value);
+  const btn=document.getElementById('pend-btn');
+  const arrow='<span style="position:absolute;right:5px;top:50%;transform:translateY(-50%);font-size:8px;">▼</span>';
+  btn.innerHTML=(checked.length===0?'Todos':checked.length===1?checked[0]:checked.length+' seleccionados')+arrow;
+}
+function clearPend(){
+  document.querySelectorAll('#pend-items input').forEach(c=>c.checked=false);
+  updatePendBtn(); renderAll();
+}
+// Cerrar al clic fuera
+document.addEventListener('click',e=>{
+  const dd=document.getElementById('pend-dd');
+  const btn=document.getElementById('pend-btn');
+  if(dd&&!dd.contains(e.target)&&!btn.contains(e.target)) dd.style.display='none';
+});
 window.clearFilters=clearFilters;
 window.openModal=openModal;
 window.closeModal=closeModal;
