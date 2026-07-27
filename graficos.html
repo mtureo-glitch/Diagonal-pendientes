@@ -255,11 +255,11 @@ function buildChart(canvas, predios, devF, compact){
   const labels  = predios.map(([p])=>p.length>16?p.slice(0,14)+'…':p);
   const fullLbls= predios.map(([p])=>p);
   const teamLbls= predios.map(([,d])=>[...d.teams].join(', '));
-  const dVerde  = predios.map(([,d])=>Math.round(d.verde));
-  const dRojo   = predios.map(([,d])=>Math.round(d.rojo));
+  const dVerde = devF==='0' ? predios.map(()=>0) : predios.map(([,d])=>Math.round(d.verde));
+  const dRojo  = devF==='2' ? predios.map(()=>0) : predios.map(([,d])=>Math.round(d.rojo));
   const datasets=[];
-  if(devF===''||devF==='2') datasets.push({label:'GANA (m³)',data:dVerde,backgroundColor:'#27ae60',borderRadius:3,barPercentage:0.72});
-  if(devF===''||devF==='0') datasets.push({label:'PIERDE (m³)',data:dRojo,backgroundColor:'#e74c3c',borderRadius:3,barPercentage:0.72});
+  if(devF!=='0') datasets.push({label:'GANA (m³)',   data:dVerde, backgroundColor:'#27ae60', borderRadius:3, barPercentage:0.72});
+  if(devF!=='2') datasets.push({label:'PIERDE (m³)', data:dRojo,  backgroundColor:'#e74c3c', borderRadius:3, barPercentage:0.72});
   const ch=new Chart(canvas.getContext('2d'),{
     type:'bar',
     data:{labels,datasets},
