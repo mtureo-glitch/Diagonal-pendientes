@@ -249,34 +249,34 @@ const labelPlugin={
     const compact=opts&&opts.compact!==false;
     const {ctx}=chart;
     ctx.save();
-    // Solo dibujar etiquetas del primer dataset visible (evitar duplicados)
-    const visibleDs=chart.data.datasets.findIndex((_,di)=>!chart.getDatasetMeta(di).hidden);
+    // Dibujar etiquetas en TODOS los datasets con valor > 0
     chart.data.datasets.forEach((ds,di)=>{
-      if(di!==visibleDs && chart.data.datasets.length>1) return;
+      const isVerde=ds.backgroundColor==='#27ae60';
+      const txtColor=isVerde?'#155724':'#7b0d0d';
+      const fs=compact?9:11;
+      const tfs=compact?8:10;
       chart.getDatasetMeta(di).data.forEach((bar,i)=>{
         const val=ds.data[i]; if(!val||val===0) return;
-        const teams=chart._teamLabels?.[i]||'';
-        const isVerde=di===0&&chart.data.datasets[0].backgroundColor==='#27ae60';
-        const color=isVerde?'#155724':'#7b0d0d';
-        const fs=compact?9:11;
-        // Fondo blanco para legibilidad
+        // Usar teamLabels por dataset: verdeTeams o rojoTeams
+        const teams=(isVerde
+          ? (chart._teamLabelsV?.[i]||chart._teamLabels?.[i]||'')
+          : (chart._teamLabelsR?.[i]||chart._teamLabels?.[i]||''));
         const m3str=fmt(val);
+        // Fondo + m3
         ctx.font=`bold ${fs}px Segoe UI`;
         const tw=ctx.measureText(m3str).width;
-        ctx.fillStyle='rgba(255,255,255,0.85)';
+        ctx.fillStyle='rgba(255,255,255,0.88)';
         ctx.fillRect(bar.x-tw/2-2, bar.y-fs-5, tw+4, fs+2);
-        // Texto m3
-        ctx.fillStyle=color;
+        ctx.fillStyle=txtColor;
         ctx.textAlign='center'; ctx.textBaseline='bottom';
         ctx.fillText(m3str, bar.x, bar.y-3);
         // Team
         if(teams){
           const ml=compact?14:22;
           const tStr=teams.length>ml?teams.slice(0,ml-1)+'…':teams;
-          const tfs=compact?8:10;
           ctx.font=`${tfs}px Segoe UI`;
           const tw2=ctx.measureText(tStr).width;
-          ctx.fillStyle='rgba(255,255,255,0.85)';
+          ctx.fillStyle='rgba(255,255,255,0.88)';
           ctx.fillRect(bar.x-tw2/2-2, bar.y-fs-tfs-8, tw2+4, tfs+2);
           ctx.fillStyle='#333';
           ctx.fillText(tStr, bar.x, bar.y-fs-4);
@@ -295,11 +295,9 @@ const zoneCache={};
 function buildChart(canvas, predios, devF, compact){
   const labels  = predios.map(([p])=>p.length>16?p.slice(0,14)+'…':p);
   const fullLbls= predios.map(([p])=>p);
-  const teamLbls= predios.map(([,d])=>{
-    if(devF==='2') return [...(d.teamsV||d.teams)].join(', ');
-    if(devF==='0') return [...(d.teamsR||d.teams)].join(', ');
-    return [...d.teams].join(', ');
-  });
+  const teamLbls = predios.map(([,d])=>[...d.teams].join(', '));
+  const teamLblsV= predios.map(([,d])=>[...(d.teamsV||d.teams)].join(', '));
+  const teamLblsR= predios.map(([,d])=>[...(d.teamsR||d.teams)].join(', '));
   const dVerde = devF==='0' ? predios.map(()=>0) : predios.map(([,d])=>Math.round(d.verde));
   const dRojo  = devF==='2' ? predios.map(()=>0) : predios.map(([,d])=>Math.round(d.rojo));
   const datasets=[];
@@ -326,7 +324,9 @@ Team: ${teamLbls[items[0].dataIndex]}`,
       }
     }
   });
-  ch._teamLabels=teamLbls;
+  ch._teamLabels =teamLbls;
+  ch._teamLabelsV=teamLblsV;
+  ch._teamLabelsR=teamLblsR;
   return ch;
 }
 
