@@ -8,111 +8,107 @@
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif;}
 body{background:#f0efec;color:#1a1a1a;font-size:12px;overflow:hidden;height:100vh;}
 .app{display:grid;grid-template-rows:auto auto 1fr;height:100vh;}
-
 .hdr{background:#695F58;padding:8px 16px;display:flex;align-items:center;gap:10px;border-bottom:2px solid #BFB800;}
 .hdr-title{font-size:13px;font-weight:500;letter-spacing:1px;flex:1;text-align:center;color:#fff;line-height:1.5;}
 .hdr-title small{font-size:9px;color:rgba(255,255,255,0.65);display:block;}
 .logo{font-size:22px;font-weight:900;letter-spacing:2px;color:#fff;}
 .btn-nav{border:1px solid rgba(255,255,255,0.5);background:transparent;color:#fff;padding:4px 10px;border-radius:3px;font-size:10px;text-decoration:none;white-space:nowrap;}
-
 .filters{background:#fff;border-bottom:2px solid #BFB800;padding:5px 12px;display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;}
 .fgrp{display:flex;flex-direction:column;gap:2px;}
 .fgrp label{font-size:9px;font-weight:700;text-transform:uppercase;color:#695F58;letter-spacing:0.4px;}
 .fgrp select{border:1px solid #ccc;border-radius:3px;padding:3px 6px;font-size:10px;background:#fff;color:#333;min-width:110px;}
 .btn-clear{border:1px solid #888;background:#fff;color:#555;padding:5px 12px;border-radius:3px;cursor:pointer;font-size:10px;align-self:flex-end;}
-
-/* Grid de 4 cards */
+/* Multiselect */
+.ms-wrap{position:relative;}
+.ms-btn{border:1px solid #ccc;border-radius:3px;padding:3px 24px 3px 6px;font-size:10px;background:#fff;color:#333;min-width:140px;cursor:pointer;position:relative;user-select:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ms-btn::after{content:"▼";position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:7px;color:#666;}
+.ms-dd{display:none;position:absolute;top:calc(100% + 2px);left:0;z-index:999;background:#fff;border:1px solid #bbb;border-radius:4px;min-width:170px;box-shadow:0 6px 18px rgba(0,0,0,0.18);padding:4px 0;}
+.ms-dd.open{display:block;}
+.ms-dd-hdr{padding:3px 10px;font-size:9px;color:#888;border-bottom:1px solid #eee;display:flex;justify-content:space-between;}
+.ms-dd-hdr span{cursor:pointer;color:#695F58;font-weight:700;}
+.ms-item{display:flex;align-items:center;gap:7px;padding:5px 10px;font-size:10px;cursor:pointer;}
+.ms-item:hover{background:#f5f3f0;}
+.ms-item input{accent-color:#695F58;width:13px;height:13px;cursor:pointer;flex-shrink:0;}
+/* Charts */
 .charts-area{overflow-y:auto;padding:10px;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-
-.zone-card{background:#fff;border:1px solid #ccc;border-radius:6px;overflow:hidden;transition:all .2s;}
-.zone-header{background:#695F58;color:#fff;padding:6px 12px;font-size:11px;font-weight:600;letter-spacing:0.5px;display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.zone-card{background:#fff;border:1px solid #ccc;border-radius:6px;overflow:hidden;}
+.zone-header{background:#695F58;color:#fff;padding:6px 12px;font-size:11px;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:8px;}
 .zone-kpis{display:flex;gap:10px;font-size:9px;flex:1;}
 .kpi-v{color:#7ddb7d;font-weight:700;}
 .kpi-r{color:#ff9090;font-weight:700;}
 .btn-expand{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.4);color:#fff;padding:2px 8px;border-radius:3px;cursor:pointer;font-size:9px;white-space:nowrap;flex-shrink:0;}
 .btn-expand:hover{background:rgba(255,255,255,0.3);}
-
 .chart-body{padding:8px 10px 10px;}
-.chart-wrap{position:relative;height:220px;transition:height .3s;}
-
+.chart-wrap{position:relative;height:220px;}
 .kpi-row{display:flex;gap:6px;margin-top:6px;}
 .kpi-box{flex:1;background:#f8f6f2;border-radius:4px;padding:5px 6px;text-align:center;}
 .kpi-box .val{font-size:13px;font-weight:700;}
-.kpi-box .lbl{font-size:8px;text-transform:uppercase;color:#888;letter-spacing:0.3px;}
+.kpi-box .lbl{font-size:8px;text-transform:uppercase;color:#888;}
 .kpi-box.verde .val{color:#27ae60;}
 .kpi-box.rojo  .val{color:#e74c3c;}
 .kpi-box.total .val{color:#695F58;}
-
-/* Modal de expansión */
+/* Modal */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:100;align-items:center;justify-content:center;}
 .modal-bg.open{display:flex;}
-.modal{background:#fff;border-radius:8px;overflow:hidden;width:92vw;max-width:1100px;height:82vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,0.3);}
+.modal{background:#fff;border-radius:8px;overflow:hidden;width:92vw;max-width:1100px;height:82vh;display:flex;flex-direction:column;}
 .modal-hdr{background:#695F58;color:#fff;padding:8px 14px;display:flex;justify-content:space-between;align-items:center;}
-.modal-hdr span{font-size:13px;font-weight:600;letter-spacing:0.5px;}
+.modal-hdr span{font-size:13px;font-weight:600;}
 .modal-close{background:none;border:1px solid rgba(255,255,255,0.5);color:#fff;padding:3px 10px;border-radius:3px;cursor:pointer;font-size:12px;}
-.modal-close:hover{background:rgba(255,255,255,0.2);}
 .modal-body{flex:1;padding:14px;overflow:hidden;position:relative;}
-.modal-chart-wrap{position:relative;height:100%;}
-
-#pend-dd label{display:flex;align-items:center;gap:6px;padding:4px 10px;font-size:10px;cursor:pointer;white-space:nowrap;}
-#pend-dd label:hover{background:#f5f3f0;}
-#pend-dd input{accent-color:#695F58;cursor:pointer;}
 </style>
 </head>
 <body>
 <div class="app">
   <div class="hdr">
     <a href="index.html" class="btn-nav">← Tabla</a>
-    <div class="hdr-title">
-      DESVÍOS POR PREDIO — EQUIPOS CEMA
-      <small id="last-update">Última actualización: 27/07/2026 00:28 hrs</small>
-    </div>
+    <div class="hdr-title">DESVÍOS POR PREDIO — EQUIPOS CEMA<small id="last-update">Última actualización: 27/07/2026 00:37 hrs</small></div>
     <div class="logo">arauco</div>
   </div>
 
   <div class="filters">
-    <div class="fgrp"><label>MES</label>
-      <select id="f-mes" onchange="renderAll()"><option value="">Todos</option></select></div>
-    <div class="fgrp"><label>TEAM</label>
-      <select id="f-team" onchange="renderAll()"><option value="">Todos</option></select></div>
-    <div class="fgrp" style="position:relative;">
+    <div class="fgrp">
+      <label>MES</label>
+      <select id="f-mes" onchange="renderAll()"><option value="">Todos</option></select>
+    </div>
+    <div class="fgrp">
+      <label>TEAM</label>
+      <select id="f-team" onchange="renderAll()"><option value="">Todos</option></select>
+    </div>
+    <div class="fgrp">
       <label>PENDIENTE</label>
-      <div id="pend-btn" onclick="togglePendDD()" style="border:1px solid #ccc;border-radius:3px;padding:3px 22px 3px 6px;font-size:10px;background:#fff;color:#333;min-width:130px;cursor:pointer;position:relative;user-select:none;">
-        Todos
-        <span style="position:absolute;right:5px;top:50%;transform:translateY(-50%);font-size:8px;">▼</span>
-      </div>
-      <div id="pend-dd" style="display:none;position:absolute;top:100%;left:0;z-index:50;background:#fff;border:1px solid #ccc;border-radius:3px;min-width:160px;box-shadow:0 4px 12px rgba(0,0,0,0.15);padding:4px 0;">
-        <div style="padding:3px 8px;font-size:9px;color:#888;border-bottom:1px solid #eee;display:flex;justify-content:space-between;">
-          <span>Pendiente</span>
-          <span onclick="clearPend()" style="cursor:pointer;color:#695F58;font-weight:700;">Limpiar</span>
+      <div class="ms-wrap" id="ms-pend-wrap">
+        <div class="ms-btn" id="ms-pend-btn">Todos</div>
+        <div class="ms-dd" id="ms-pend-dd">
+          <div class="ms-dd-hdr">Seleccionar <span id="ms-pend-clear">Limpiar</span></div>
+          <div id="ms-pend-items"></div>
         </div>
-        <div id="pend-items"></div>
       </div>
     </div>
-    <div class="fgrp"><label>ESTADO PLAN</label>
-      <select id="f-sp" onchange="renderAll()"><option value="">Todos</option></select></div>
-    <div class="fgrp"><label>ESTADO</label>
+    <div class="fgrp">
+      <label>ESTADO PLAN</label>
+      <select id="f-sp" onchange="renderAll()"><option value="">Todos</option></select>
+    </div>
+    <div class="fgrp">
+      <label>ESTADO</label>
       <select id="f-dev" onchange="renderAll()">
         <option value="">Verde + Rojo</option>
         <option value="2">🟢 Verde (GANA)</option>
         <option value="0">🔴 Rojo (PIERDE)</option>
-      </select></div>
-    <button class="btn-clear" onclick="clearFilters()">Quitar Filtros</button>
+      </select>
+    </div>
+    <button class="btn-clear" onclick="clearAllFilters()">Quitar Filtros</button>
   </div>
 
   <div class="charts-area" id="charts-area"></div>
 </div>
 
-<!-- Modal expansión -->
-<div class="modal-bg" id="modal-bg" onclick="closeModal(event)">
+<div class="modal-bg" id="modal-bg">
   <div class="modal" id="modal">
     <div class="modal-hdr">
       <span id="modal-title">Zona</span>
-      <button class="modal-close" onclick="closeModal()">✕ Cerrar</button>
+      <button class="modal-close" id="modal-close-btn">✕ Cerrar</button>
     </div>
-    <div class="modal-body">
-      <div class="modal-chart-wrap"><canvas id="modal-canvas"></canvas></div>
-    </div>
+    <div class="modal-body"><canvas id="modal-canvas"></canvas></div>
   </div>
 </div>
 
@@ -120,6 +116,7 @@ body{background:#f0efec;color:#1a1a1a;font-size:12px;overflow:hidden;height:100v
 <script>
 (async function(){
 
+// Fecha GitHub
 fetch('https://api.github.com/repos/mtureo-glitch/Diagonal-pendientes/commits?path=data.json&per_page=1&t='+Date.now())
   .then(r=>r.json()).then(cs=>{
     if(cs&&cs[0]&&cs[0].commit){
@@ -132,6 +129,7 @@ fetch('https://api.github.com/repos/mtureo-glitch/Diagonal-pendientes/commits?pa
 const D = await fetch('data.json').then(r=>r.json());
 const MESES_ORD=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
+// Solo CEMA, VERDE(2) o ROJO(0)
 const ROWS = D.rows.filter(r=>r[11]===0&&(r[8]===0||r[8]===2)).map(r=>({
   zona:  D.Z[r[0]], predio:D.P[r[3]], tnom:D.TN[r[10]],
   mes:   r[13]>=0?D.MES[r[13]]:'', pend:r[19]>=0?D.PEND[r[19]]:'',
@@ -140,71 +138,108 @@ const ROWS = D.rows.filter(r=>r[11]===0&&(r[8]===0||r[8]===2)).map(r=>({
 
 const ZONAS=[...new Set(ROWS.map(r=>r.zona))].sort();
 
-function populate(id,vals){
+// Poblar selects simples
+function addOpts(id,vals){
   const s=document.getElementById(id);
   vals.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;s.appendChild(o);});
 }
-populate('f-mes',MESES_ORD.filter(m=>ROWS.some(r=>r.mes===m)));
-populate('f-team',[...new Set(ROWS.map(r=>r.tnom))].sort((a,b)=>a.localeCompare(b)));
-// Poblar multiselect pendiente
-const pendVals=[...new Set(ROWS.map(r=>r.pend).filter(Boolean))].sort();
-const pendItems=document.getElementById('pend-items');
+addOpts('f-mes', MESES_ORD.filter(m=>ROWS.some(r=>r.mes===m)));
+addOpts('f-team', [...new Set(ROWS.map(r=>r.tnom))].sort((a,b)=>a.localeCompare(b)));
+addOpts('f-sp',  [...new Set(ROWS.map(r=>r.sp).filter(Boolean))].sort());
+
+// Multiselect PENDIENTE
+const pendVals = [...new Set(ROWS.map(r=>r.pend).filter(Boolean))].sort();
+const msItems  = document.getElementById('ms-pend-items');
 pendVals.forEach(v=>{
-  const lbl=document.createElement('label');
-  const cb=document.createElement('input');
-  cb.type='checkbox'; cb.value=v;
-  cb.addEventListener('change',()=>{updatePendBtn();renderAll();});
-  lbl.appendChild(cb);
-  lbl.appendChild(document.createTextNode(' '+v));
-  pendItems.appendChild(lbl);
+  const div = document.createElement('div');
+  div.className = 'ms-item';
+  const cb = document.createElement('input');
+  cb.type = 'checkbox';
+  cb.value = v;
+  cb.id = 'pend-cb-'+v.replace(/\W/g,'_');
+  const lbl = document.createElement('label');
+  lbl.htmlFor = cb.id;
+  lbl.textContent = v;
+  lbl.style.cursor = 'pointer';
+  lbl.style.flex = '1';
+  cb.addEventListener('change', ()=>{ updatePendBtn(); renderAll(); });
+  div.appendChild(cb);
+  div.appendChild(lbl);
+  msItems.appendChild(div);
 });
-populate('f-sp',[...new Set(ROWS.map(r=>r.sp).filter(Boolean))].sort());
+
+// Toggle dropdown
+document.getElementById('ms-pend-btn').addEventListener('click', e=>{
+  e.stopPropagation();
+  document.getElementById('ms-pend-dd').classList.toggle('open');
+});
+// Cerrar al click fuera
+document.addEventListener('click', e=>{
+  const wrap = document.getElementById('ms-pend-wrap');
+  if(!wrap.contains(e.target)) document.getElementById('ms-pend-dd').classList.remove('open');
+});
+// Limpiar
+document.getElementById('ms-pend-clear').addEventListener('click', e=>{
+  e.stopPropagation();
+  document.querySelectorAll('#ms-pend-items input').forEach(c=>c.checked=false);
+  updatePendBtn(); renderAll();
+});
+
+function updatePendBtn(){
+  const checked=[...document.querySelectorAll('#ms-pend-items input:checked')].map(c=>c.value);
+  const btn=document.getElementById('ms-pend-btn');
+  btn.textContent = checked.length===0?'Todos': checked.length===1?checked[0]: checked.length+' seleccionados';
+}
+
+function getSelPends(){
+  return new Set([...document.querySelectorAll('#ms-pend-items input:checked')].map(c=>c.value));
+}
+
+function clearAllFilters(){
+  ['f-mes','f-team','f-sp','f-dev'].forEach(id=>document.getElementById(id).value='');
+  document.querySelectorAll('#ms-pend-items input').forEach(c=>c.checked=false);
+  updatePendBtn(); renderAll();
+}
 
 function getFiltered(){
-  const mes=document.getElementById('f-mes').value,
-        team=document.getElementById('f-team').value,
-        sp=document.getElementById('f-sp').value,
-        dev=document.getElementById('f-dev').value;
-  const selPends=new Set([...document.querySelectorAll('#pend-items input:checked')].map(c=>c.value));
+  const mes  = document.getElementById('f-mes').value;
+  const team = document.getElementById('f-team').value;
+  const sp   = document.getElementById('f-sp').value;
+  const dev  = document.getElementById('f-dev').value;
+  const pends= getSelPends();
   return ROWS.filter(r=>
-    (!mes||r.mes===mes)&&(!team||r.tnom===team)&&
-    (selPends.size===0||selPends.has(r.pend))&&(!sp||r.sp===sp)&&
-    (dev===''||String(r.dev)===dev));
+    (!mes  || r.mes===mes) &&
+    (!team || r.tnom===team) &&
+    (pends.size===0 || pends.has(r.pend)) &&
+    (!sp   || r.sp===sp) &&
+    (dev==='' || String(r.dev)===dev)
+  );
 }
 
-function clearFilters(){
-  ['f-mes','f-team','f-sp','f-dev'].forEach(id=>document.getElementById(id).value='');
-  clearPend();
-  renderAll();
-}
-
+// Helpers
 const fmt=n=>n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':Math.round(n).toLocaleString('es-CL');
 const fmtFull=n=>Math.round(n).toLocaleString('es-CL');
 
-// Plugin etiquetas fijas
+// Plugin etiquetas encima de barras
 const labelPlugin={
   id:'barLabels',
-  afterDatasetsDraw(chart,_,opts={}){
-    const {ctx,scales:{x,y}}=chart;
-    const compact=opts.compact!==false;
+  afterDatasetsDraw(chart,_,opts){
+    const compact=opts&&opts.compact!==false;
+    const {ctx}=chart;
     ctx.save();
     chart.data.datasets.forEach((ds,di)=>{
       chart.getDatasetMeta(di).data.forEach((bar,i)=>{
         const val=ds.data[i]; if(!val) return;
         const teams=chart._teamLabels?.[i]||'';
-        const color=di===0?'#1a7d3a':'#a01010';
-        // m3
-        ctx.fillStyle=color;
-        ctx.font=`bold ${compact?8:10}px Segoe UI`;
         ctx.textAlign='center'; ctx.textBaseline='bottom';
+        ctx.fillStyle=di===0?'#1a7d3a':'#a01010';
+        ctx.font=`bold ${compact?8:10}px Segoe UI`;
         ctx.fillText(fmt(val), bar.x, bar.y-2);
-        // team
         if(teams){
-          const maxLen=compact?10:18;
-          const tStr=teams.length>maxLen?teams.slice(0,maxLen-1)+'…':teams;
+          const ml=compact?12:20;
           ctx.font=`${compact?7:9}px Segoe UI`;
           ctx.fillStyle='#444';
-          ctx.fillText(tStr, bar.x, bar.y-(compact?12:15));
+          ctx.fillText(teams.length>ml?teams.slice(0,ml-1)+'…':teams, bar.x, bar.y-(compact?13:16));
         }
       });
     });
@@ -215,69 +250,64 @@ Chart.register(labelPlugin);
 
 const chartInst={};
 let modalInst=null;
-// Guardar datos por zona para reusar en modal
-const zoneData={};
+const zoneCache={};
 
-function buildDatasets(predios, devFilter){
-  const labels=predios.map(([p])=>p.length>16?p.slice(0,14)+'…':p);
-  const fullLabels=predios.map(([p])=>p);
-  const teamLabels=predios.map(([,d])=>[...d.teams].join(', '));
-  const dataVerde=predios.map(([,d])=>Math.round(d.verde));
-  const dataRojo =predios.map(([,d])=>Math.round(d.rojo));
+function buildChart(canvas, predios, devF, compact){
+  const labels  = predios.map(([p])=>p.length>16?p.slice(0,14)+'…':p);
+  const fullLbls= predios.map(([p])=>p);
+  const teamLbls= predios.map(([,d])=>[...d.teams].join(', '));
+  const dVerde  = predios.map(([,d])=>Math.round(d.verde));
+  const dRojo   = predios.map(([,d])=>Math.round(d.rojo));
   const datasets=[];
-  if(devFilter===''||devFilter==='2')
-    datasets.push({label:'GANA (m³)',data:dataVerde,backgroundColor:'#27ae60',borderRadius:4,barPercentage:0.72});
-  if(devFilter===''||devFilter==='0')
-    datasets.push({label:'PIERDE (m³)',data:dataRojo,backgroundColor:'#e74c3c',borderRadius:4,barPercentage:0.72});
-  return {labels,fullLabels,teamLabels,datasets};
+  if(devF===''||devF==='2') datasets.push({label:'GANA (m³)',data:dVerde,backgroundColor:'#27ae60',borderRadius:3,barPercentage:0.72});
+  if(devF===''||devF==='0') datasets.push({label:'PIERDE (m³)',data:dRojo,backgroundColor:'#e74c3c',borderRadius:3,barPercentage:0.72});
+  const ch=new Chart(canvas.getContext('2d'),{
+    type:'bar',
+    data:{labels,datasets},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      layout:{padding:{top:compact?28:36}},
+      plugins:{
+        legend:{position:'top',labels:{font:{size:compact?9:11},boxWidth:10,padding:6}},
+        barLabels:{compact},
+        tooltip:{callbacks:{
+          title:items=>`${fullLbls[items[0].dataIndex]}
+Team: ${teamLbls[items[0].dataIndex]}`,
+          label:c=>`${c.dataset.label}: ${c.parsed.y.toLocaleString('es-CL')} m³`
+        }}
+      },
+      scales:{
+        x:{ticks:{font:{size:compact?8:10},maxRotation:compact?35:45,autoSkip:false},grid:{display:false}},
+        y:{ticks:{font:{size:compact?8:10},callback:v=>fmt(v)},grid:{color:'#f0eeeb'}}
+      }
+    }
+  });
+  ch._teamLabels=teamLbls;
+  return ch;
 }
 
-function chartOptions(fullLabels,teamLabels,compact=true){
-  return {
-    responsive:true, maintainAspectRatio:false,
-    layout:{padding:{top:compact?28:36}},
-    plugins:{
-      legend:{position:'top',labels:{font:{size:compact?9:11},boxWidth:12,padding:8}},
-      barLabels:{compact},
-      tooltip:{callbacks:{
-        title:items=>`${fullLabels[items[0].dataIndex]}
-Team: ${teamLabels[items[0].dataIndex]}`,
-        label:c=>`${c.dataset.label}: ${c.parsed.y.toLocaleString('es-CL')} m³`
-      }}
-    },
-    scales:{
-      x:{ticks:{font:{size:compact?8:10},maxRotation:compact?35:45,autoSkip:false},grid:{display:false}},
-      y:{ticks:{font:{size:compact?8:10},callback:v=>fmt(v)},grid:{color:'#f0eeeb'}}
-    }
-  };
+function getPredios(zona, filtered){
+  const byP={};
+  filtered.filter(r=>r.zona===zona).forEach(r=>{
+    if(!byP[r.predio]) byP[r.predio]={verde:0,rojo:0,teams:new Set()};
+    byP[r.predio].teams.add(r.tnom);
+    if(r.dev===2) byP[r.predio].verde+=r.vol;
+    else          byP[r.predio].rojo +=r.vol;
+  });
+  return Object.entries(byP).sort((a,b)=>(b[1].verde+b[1].rojo)-(a[1].verde+a[1].rojo));
 }
 
 function renderAll(){
   const filtered=getFiltered();
-  const devFilter=document.getElementById('f-dev').value;
+  const devF=document.getElementById('f-dev').value;
   const area=document.getElementById('charts-area');
 
   ZONAS.forEach(zona=>{
-    const zRows=filtered.filter(r=>r.zona===zona);
     const zid=zona.replace(/[^a-z]/gi,'_');
-
-    const byPredio={};
-    zRows.forEach(r=>{
-      if(!byPredio[r.predio]) byPredio[r.predio]={verde:0,rojo:0,teams:new Set()};
-      byPredio[r.predio].teams.add(r.tnom);
-      if(r.dev===2) byPredio[r.predio].verde+=r.vol;
-      else          byPredio[r.predio].rojo +=r.vol;
-    });
-    const predios=Object.entries(byPredio)
-      .sort((a,b)=>(b[1].verde+b[1].rojo)-(a[1].verde+a[1].rojo))
-      .slice(0,15);
-
-    const {labels,fullLabels,teamLabels,datasets}=buildDatasets(predios,devFilter);
-    const volVerde=predios.reduce((s,[,d])=>s+d.verde,0);
-    const volRojo =predios.reduce((s,[,d])=>s+d.rojo,0);
-
-    // Guardar para modal
-    zoneData[zona]={predios,devFilter,fullLabels,teamLabels,datasets,volVerde,volRojo,labels};
+    const predios=getPredios(zona,filtered).slice(0,15);
+    const volV=predios.reduce((s,[,d])=>s+d.verde,0);
+    const volR=predios.reduce((s,[,d])=>s+d.rojo,0);
+    zoneCache[zona]={predios:getPredios(zona,filtered), devF};
 
     let card=document.getElementById('card-'+zid);
     if(!card){
@@ -286,11 +316,8 @@ function renderAll(){
       card.innerHTML=`
         <div class="zone-header">
           <span>Zona ${zona}</span>
-          <span class="zone-kpis">
-            <span class="kpi-v" id="kv-${zid}"></span>
-            <span class="kpi-r" id="kr-${zid}"></span>
-          </span>
-          <button class="btn-expand" onclick="openModal('${zona}')">⛶ Expandir</button>
+          <span class="zone-kpis"><span class="kpi-v" id="kv-${zid}"></span><span class="kpi-r" id="kr-${zid}"></span></span>
+          <button class="btn-expand" data-zona="${zona}">⛶ Expandir</button>
         </div>
         <div class="chart-body">
           <div class="chart-wrap"><canvas id="cv-${zid}"></canvas></div>
@@ -300,96 +327,44 @@ function renderAll(){
             <div class="kpi-box total"><div class="val" id="kpit-${zid}">—</div><div class="lbl">TOTAL (m³)</div></div>
           </div>
         </div>`;
+      card.querySelector('.btn-expand').addEventListener('click',()=>openModal(zona));
       area.appendChild(card);
     }
 
-    document.getElementById('kv-'+zid).textContent='🟢 '+fmtFull(volVerde)+' m³';
-    document.getElementById('kr-'+zid).textContent='🔴 '+fmtFull(volRojo)+' m³';
-    document.getElementById('kpiv-'+zid).textContent=fmtFull(volVerde);
-    document.getElementById('kpir-'+zid).textContent=fmtFull(volRojo);
-    document.getElementById('kpit-'+zid).textContent=fmtFull(volVerde+volRojo);
+    document.getElementById('kv-'+zid).textContent='🟢 '+fmtFull(volV)+' m³';
+    document.getElementById('kr-'+zid).textContent='🔴 '+fmtFull(volR)+' m³';
+    document.getElementById('kpiv-'+zid).textContent=fmtFull(volV);
+    document.getElementById('kpir-'+zid).textContent=fmtFull(volR);
+    document.getElementById('kpit-'+zid).textContent=fmtFull(volV+volR);
 
     if(chartInst[zid]) chartInst[zid].destroy();
-    const ctx=document.getElementById('cv-'+zid).getContext('2d');
-    const ch=new Chart(ctx,{type:'bar',data:{labels,datasets},options:chartOptions(fullLabels,teamLabels,true)});
-    ch._teamLabels=teamLabels;
-    chartInst[zid]=ch;
+    chartInst[zid]=buildChart(document.getElementById('cv-'+zid), predios, devF, true);
   });
 }
 
 // Modal
 function openModal(zona){
-  const {predios,devFilter,fullLabels,teamLabels,labels}=zoneData[zona];
-
-  // En modal mostrar TODOS los predios (sin límite de 15)
-  const allPredios=Object.entries(
-    (function(){
-      const filtered=getFiltered().filter(r=>r.zona===zona);
-      const bp={};
-      filtered.forEach(r=>{
-        if(!bp[r.predio]) bp[r.predio]={verde:0,rojo:0,teams:new Set()};
-        bp[r.predio].teams.add(r.tnom);
-        if(r.dev===2) bp[r.predio].verde+=r.vol;
-        else          bp[r.predio].rojo +=r.vol;
-      });
-      return bp;
-    })()
-  ).sort((a,b)=>(b[1].verde+b[1].rojo)-(a[1].verde+a[1].rojo));
-
-  const dv=document.getElementById('f-dev').value;
-  const {labels:mLabels,fullLabels:mFull,teamLabels:mTeam,datasets:mDs}=buildDatasets(allPredios,dv);
-
-  document.getElementById('modal-title').textContent=
-    `Zona ${zona} — ${allPredios.length} predios`;
+  const {predios,devF}=zoneCache[zona];
+  document.getElementById('modal-title').textContent=`Zona ${zona} — ${predios.length} predios`;
   document.getElementById('modal-bg').classList.add('open');
-
-  if(modalInst){ modalInst.destroy(); modalInst=null; }
-
-  const ctx=document.getElementById('modal-canvas').getContext('2d');
-  modalInst=new Chart(ctx,{
-    type:'bar',
-    data:{labels:mLabels,datasets:mDs},
-    options:chartOptions(mFull,mTeam,false)
-  });
-  modalInst._teamLabels=mTeam;
+  if(modalInst){modalInst.destroy();modalInst=null;}
+  const canvas=document.getElementById('modal-canvas');
+  canvas.style.height='100%'; canvas.style.width='100%';
+  modalInst=buildChart(canvas, predios, devF, false);
 }
 
-function closeModal(e){
-  if(e && e.target!==document.getElementById('modal-bg') && e.type==='click') return;
+document.getElementById('modal-close-btn').addEventListener('click',()=>{
   document.getElementById('modal-bg').classList.remove('open');
   if(modalInst){modalInst.destroy();modalInst=null;}
-}
-
-renderAll();
-window.renderAll=renderAll;
-
-// Dropdown multiselect pendiente
-function togglePendDD(){
-  const dd=document.getElementById('pend-dd');
-  dd.style.display=dd.style.display==='none'?'block':'none';
-}
-function updatePendBtn(){
-  const checked=[...document.querySelectorAll('#pend-items input:checked')].map(c=>c.value);
-  const btn=document.getElementById('pend-btn');
-  const arrow='<span style="position:absolute;right:5px;top:50%;transform:translateY(-50%);font-size:8px;">▼</span>';
-  btn.innerHTML=(checked.length===0?'Todos':checked.length===1?checked[0]:checked.length+' seleccionados')+arrow;
-}
-function clearPend(){
-  document.querySelectorAll('#pend-items input').forEach(c=>c.checked=false);
-  updatePendBtn(); renderAll();
-}
-// Cerrar al clic fuera
-document.addEventListener('mousedown',e=>{
-  const dd=document.getElementById('pend-dd');
-  const btn=document.getElementById('pend-btn');
-  if(dd&&!dd.contains(e.target)&&!btn.contains(e.target)){
-    setTimeout(()=>{ dd.style.display='none'; },150);
+});
+document.getElementById('modal-bg').addEventListener('click',e=>{
+  if(e.target===document.getElementById('modal-bg')){
+    document.getElementById('modal-bg').classList.remove('open');
+    if(modalInst){modalInst.destroy();modalInst=null;}
   }
 });
-window.clearFilters=clearFilters;
-window.openModal=openModal;
-window.closeModal=closeModal;
 
+renderAll();
 })();
 </script>
 </body>
