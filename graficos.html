@@ -130,24 +130,28 @@ const D = await fetch('data.json').then(r=>r.json());
 const MESES_ORD=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
 // Solo CEMA, VERDE(2) o ROJO(0)
-// Lógica de desvío gráfico: costo equipo ACTA vs costo esperado por pendiente
-const COSTO_EQ={'SKGR':1,'SKHU':1,'FORW':1,'AMOV':1,'FOWI':2,'GRWI':2,'ANIM':2,'T500':3,'T400':3};
+// Lógica desvío gráfico: EQUIPO ARCGIS (planificado) vs PENDIENTE (pestaña Team)
+const COSTO_EP={
+  'SK.GRAPPLE':1,'SK.HUINCHE':1,'SK.HUINCHE MEC':1,
+  'FW.HUINCHE':2,'ANIMALES':2,
+  'TORRE':3
+};
 const COSTO_PEND={'0-35% Asist':1,'0-35% Astillador':1,'Asistido':2,'Remate':2,'Torre Mecanizada':3};
 
 const ROWS = D.rows.filter(r=>r[11]===0).map(r=>{
   const pend=r[19]>=0?D.PEND[r[19]]:'';
-  const er  =r[7]>=0?D.ER[r[7]]:'';
+  const ep  =r[6]>=0?D.EP[r[6]]:'';   // EQUIPO ARCGIS planificado
   const cp  =COSTO_PEND[pend];
-  const cr  =COSTO_EQ[er];
-  let devG=null; // desvío para gráfico
-  if(cp&&cr){
-    if(cr<cp) devG=2;      // VERDE: equipo más barato = GANA
-    else if(cr>cp) devG=0; // ROJO: equipo más caro = PIERDE
+  const ce  =COSTO_EP[ep];
+  let devG=null;
+  if(cp&&ce){
+    if(ce<cp) devG=2;      // VERDE: arcgis más barato que pendiente = GANA
+    else if(ce>cp) devG=0; // ROJO:  arcgis más caro  que pendiente = PIERDE
   }
   return {
-    zona: D.Z[r[0]], predio:D.P[r[3]], tnom:D.TN[r[10]],
-    mes:  r[13]>=0?D.MES[r[13]]:'', pend,
-    sp:   r[14]>=0?D.SP[r[14]]:'', dev:devG, vol:r[12]
+    zona:D.Z[r[0]], predio:D.P[r[3]], tnom:D.TN[r[10]],
+    mes: r[13]>=0?D.MES[r[13]]:'', pend,
+    sp:  r[14]>=0?D.SP[r[14]]:'', dev:devG, vol:r[12]
   };
 }).filter(r=>r.dev!==null);
 
