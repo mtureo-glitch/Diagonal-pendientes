@@ -55,6 +55,25 @@ body{background:#f0efec;color:#1a1a1a;font-size:12px;overflow:hidden;height:100v
 .modal-hdr span{font-size:13px;font-weight:600;}
 .modal-close{background:none;border:1px solid rgba(255,255,255,0.5);color:#fff;padding:3px 10px;border-radius:3px;cursor:pointer;font-size:12px;}
 .modal-body{flex:1;padding:14px;overflow:hidden;position:relative;}
+
+/* NEG NOM */
+.neg-nom-badge{
+  position:absolute;
+  background:#695F58;color:#fff;
+  font-size:8px;font-weight:700;
+  padding:1px 5px;border-radius:2px;
+  pointer-events:none;
+  white-space:nowrap;
+}
+.neg-nom-panel{
+  background:#fff3cd;border:1px solid #f0c040;
+  border-radius:4px;padding:6px 10px;
+  margin-top:6px;font-size:9px;color:#695F58;
+  display:none;
+}
+.neg-nom-panel.has-items{display:block;}
+.neg-nom-panel ul{margin:3px 0 0 12px;}
+.neg-nom-panel li{font-size:9px;line-height:1.6;}
 </style>
 </head>
 <body>
@@ -287,6 +306,47 @@ const labelPlugin={
   }
 };
 Chart.register(labelPlugin);
+// Set de predios marcados como NEG.NOM
+const negNomSet = new Set(JSON.parse(localStorage.getItem('negnom')||'[]'));
+function saveNegNom(){ try{localStorage.setItem('negnom',JSON.stringify([...negNomSet]));}catch(e){} }
+
+const negNomPlugin={
+  id:'negNom',
+  afterDatasetsDraw(chart){
+    if(!chart._isRojo) return;
+    const {ctx}=chart;
+    ctx.save();
+    chart.getDatasetMeta(0).data.forEach((bar,i)=>{
+      const lbl=chart._fullLabels?.[i]||'';
+      if(!negNomSet.has('negnom:'+lbl)) return;
+      // Dibujar etiqueta NEG. NOM sobre la barra
+      const text='NEG. NOM';
+      ctx.font='bold 9px Segoe UI';
+      const tw=ctx.measureText(text).width;
+      ctx.fillStyle='rgba(105,95,88,0.92)';
+      ctx.beginPath();
+      const rx=bar.x-tw/2-5, ry=bar.y-26, rw=tw+10, rh=16;
+      ctx.roundRect(rx,ry,rw,rh,3);
+      ctx.fill();
+      ctx.fillStyle='#fff';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(text, bar.x, ry+rh/2);
+      // Flecha hacia abajo
+      ctx.fillStyle='rgba(105,95,88,0.92)';
+      ctx.beginPath();
+      ctx.moveTo(bar.x-5,ry+rh); ctx.lineTo(bar.x+5,ry+rh); ctx.lineTo(bar.x,ry+rh+5);
+      ctx.fill();
+    });
+    ctx.restore();
+  }
+};
+Chart.register(negNomPlugin);
+
+function updateNegNomPanels(){
+  // Actualizar todos los charts rojos
+  Object.values(chartInst).forEach(ch=>{ if(ch&&ch._isRojo) ch.update(); });
+}
+
 
 const chartInst={};
 let modalInst=null;
@@ -327,6 +387,22 @@ Team: ${teamLbl[items[0].dataIndex]}`,
   ch._teamLabels=teamLbl;
   ch._teamLabelsV=teamLbl;
   ch._teamLabelsR=teamLbl;
+  ch._fullLabels=fullLbl;
+  ch._isRojo=!isV;
+  // Click en barra roja → toggle NEG.NOM
+  if(!isV){
+    canvas.addEventListener('click', evt=>{
+      const pts=ch.getElementsAtEventForMode(evt,'nearest',{intersect:true},false);
+      if(!pts.length) return;
+      const i=pts[0].index;
+      const key='negnom:'+fullLbl[i];
+      if(negNomSet.has(key)) negNomSet.delete(key);
+      else negNomSet.add(key);
+      saveNegNom();
+      ch.update();
+      updateNegNomPanels();
+    });
+  }
   return ch;
 }
 
@@ -423,7 +499,7 @@ function renderAll(){
               <div style="text-align:center;font-size:11px;font-weight:700;color:#27ae60;margin-top:4px;" id="kpiv-${zid}">—</div>
             </div>
             <div>
-              <div style="font-size:9px;font-weight:700;color:#e74c3c;text-align:center;margin-bottom:3px;">🔴 PIERDE</div>
+              <div style="font-size:9px;font-weight:700;color:#e74c3c;text-align:center;margin-bottom:3px;">🔴 PIERDE <span style="font-size:8px;color:#888;">(clic en barra → NEG. NOM)</span></div>
               <div class="chart-wrap"><canvas id="cv-r-${zid}"></canvas></div>
               <div style="text-align:center;font-size:11px;font-weight:700;color:#e74c3c;margin-top:4px;" id="kpir-${zid}">—</div>
             </div>
