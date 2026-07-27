@@ -232,19 +232,37 @@ const labelPlugin={
     const compact=opts&&opts.compact!==false;
     const {ctx}=chart;
     ctx.save();
+    // Solo dibujar etiquetas del primer dataset visible (evitar duplicados)
+    const visibleDs=chart.data.datasets.findIndex((_,di)=>!chart.getDatasetMeta(di).hidden);
     chart.data.datasets.forEach((ds,di)=>{
+      if(di!==visibleDs && chart.data.datasets.length>1) return;
       chart.getDatasetMeta(di).data.forEach((bar,i)=>{
-        const val=ds.data[i]; if(!val) return;
+        const val=ds.data[i]; if(!val||val===0) return;
         const teams=chart._teamLabels?.[i]||'';
+        const isVerde=di===0&&chart.data.datasets[0].backgroundColor==='#27ae60';
+        const color=isVerde?'#155724':'#7b0d0d';
+        const fs=compact?9:11;
+        // Fondo blanco para legibilidad
+        const m3str=fmt(val);
+        ctx.font=`bold ${fs}px Segoe UI`;
+        const tw=ctx.measureText(m3str).width;
+        ctx.fillStyle='rgba(255,255,255,0.85)';
+        ctx.fillRect(bar.x-tw/2-2, bar.y-fs-5, tw+4, fs+2);
+        // Texto m3
+        ctx.fillStyle=color;
         ctx.textAlign='center'; ctx.textBaseline='bottom';
-        ctx.fillStyle=di===0?'#1a7d3a':'#a01010';
-        ctx.font=`bold ${compact?8:10}px Segoe UI`;
-        ctx.fillText(fmt(val), bar.x, bar.y-2);
+        ctx.fillText(m3str, bar.x, bar.y-3);
+        // Team
         if(teams){
-          const ml=compact?12:20;
-          ctx.font=`${compact?7:9}px Segoe UI`;
-          ctx.fillStyle='#444';
-          ctx.fillText(teams.length>ml?teams.slice(0,ml-1)+'…':teams, bar.x, bar.y-(compact?13:16));
+          const ml=compact?14:22;
+          const tStr=teams.length>ml?teams.slice(0,ml-1)+'…':teams;
+          const tfs=compact?8:10;
+          ctx.font=`${tfs}px Segoe UI`;
+          const tw2=ctx.measureText(tStr).width;
+          ctx.fillStyle='rgba(255,255,255,0.85)';
+          ctx.fillRect(bar.x-tw2/2-2, bar.y-fs-tfs-8, tw2+4, tfs+2);
+          ctx.fillStyle='#333';
+          ctx.fillText(tStr, bar.x, bar.y-fs-4);
         }
       });
     });
@@ -350,11 +368,13 @@ function renderAll(){
       area.appendChild(card);
     }
 
-    document.getElementById('kv-'+zid).textContent='🟢 '+fmtFull(volV)+' m³';
-    document.getElementById('kr-'+zid).textContent='🔴 '+fmtFull(volR)+' m³';
-    document.getElementById('kpiv-'+zid).textContent=fmtFull(volV);
-    document.getElementById('kpir-'+zid).textContent=fmtFull(volR);
-    document.getElementById('kpit-'+zid).textContent=fmtFull(volV+volR);
+    const showV=devF!=='0', showR=devF!=='2';
+    const dispV=showV?volV:0, dispR=showR?volR:0;
+    document.getElementById('kv-'+zid).textContent='🟢 '+fmtFull(dispV)+' m³';
+    document.getElementById('kr-'+zid).textContent='🔴 '+fmtFull(dispR)+' m³';
+    document.getElementById('kpiv-'+zid).textContent=fmtFull(dispV);
+    document.getElementById('kpir-'+zid).textContent=fmtFull(dispR);
+    document.getElementById('kpit-'+zid).textContent=fmtFull(dispV+dispR);
 
     if(chartInst[zid]) chartInst[zid].destroy();
     chartInst[zid]=buildChart(document.getElementById('cv-'+zid), predios, devF, true);
