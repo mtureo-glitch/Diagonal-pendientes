@@ -6,85 +6,56 @@
 <title>Desvíos por Zona — CEMA</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif;}
-body{background:#f0efec;color:#1a1a1a;font-size:12px;min-height:100vh;}
-.app{display:grid;grid-template-rows:auto auto 1fr;height:100vh;overflow:hidden;}
+body{background:#f0efec;color:#1a1a1a;font-size:12px;overflow:hidden;height:100vh;}
+.app{display:grid;grid-template-rows:auto auto 1fr;height:100vh;}
 
-/* HEADER */
-.hdr{background:#695F58;padding:8px 16px;display:flex;align-items:center;gap:12px;border-bottom:2px solid #BFB800;}
-.hdr-title{font-size:14px;font-weight:500;letter-spacing:1px;flex:1;text-align:center;color:#fff;line-height:1.5;}
+.hdr{background:#695F58;padding:8px 16px;display:flex;align-items:center;gap:10px;border-bottom:2px solid #BFB800;}
+.hdr-title{font-size:13px;font-weight:500;letter-spacing:1px;flex:1;text-align:center;color:#fff;line-height:1.5;}
 .hdr-title small{font-size:9px;color:rgba(255,255,255,0.65);display:block;}
-.logo{font-size:24px;font-weight:900;letter-spacing:2px;color:#fff;}
+.logo{font-size:22px;font-weight:900;letter-spacing:2px;color:#fff;}
+.btn-nav{border:1px solid rgba(255,255,255,0.5);background:transparent;color:#fff;padding:4px 10px;border-radius:3px;cursor:pointer;font-size:10px;text-decoration:none;white-space:nowrap;}
 
-/* FILTERS BAR */
-.filters{background:#fff;border-bottom:2px solid #BFB800;padding:6px 12px;display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;}
+.filters{background:#fff;border-bottom:2px solid #BFB800;padding:5px 12px;display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;}
 .fgrp{display:flex;flex-direction:column;gap:2px;}
 .fgrp label{font-size:9px;font-weight:700;text-transform:uppercase;color:#695F58;letter-spacing:0.4px;}
-.fgrp select{border:1px solid #ccc;border-radius:3px;padding:3px 6px;font-size:10px;background:#fff;color:#333;cursor:pointer;min-width:120px;}
-.fgrp select:focus{outline:none;border-color:#BFB800;}
-.btn-clear{border:1px solid #888;background:#fff;color:#555;padding:5px 14px;border-radius:3px;cursor:pointer;font-size:10px;margin-bottom:0;align-self:flex-end;}
-.btn-clear:hover{background:#f5f5f5;}
+.fgrp select{border:1px solid #ccc;border-radius:3px;padding:3px 6px;font-size:10px;background:#fff;color:#333;min-width:110px;}
+.btn-clear{border:1px solid #888;background:#fff;color:#555;padding:5px 12px;border-radius:3px;cursor:pointer;font-size:10px;align-self:flex-end;}
 
-/* CHARTS GRID */
-.charts-area{overflow-y:auto;padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.zone-card{background:#fff;border:1px solid #ccc;border-radius:6px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08);}
-.zone-header{background:#695F58;color:#fff;padding:7px 12px;font-size:12px;font-weight:600;letter-spacing:0.5px;display:flex;justify-content:space-between;align-items:center;}
-.zone-header .kpis{display:flex;gap:16px;font-size:10px;}
+.charts-area{overflow-y:auto;padding:10px;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.zone-card{background:#fff;border:1px solid #ccc;border-radius:6px;overflow:hidden;}
+.zone-header{background:#695F58;color:#fff;padding:6px 12px;font-size:11px;font-weight:600;letter-spacing:0.5px;display:flex;justify-content:space-between;align-items:center;}
+.zone-kpis{display:flex;gap:12px;font-size:9px;}
 .kpi-v{color:#7ddb7d;font-weight:700;}
 .kpi-r{color:#ff9090;font-weight:700;}
-.chart-body{padding:10px 14px 14px;}
-.chart-wrap{position:relative;height:180px;}
-canvas{width:100%!important;}
+.chart-body{padding:8px 10px 10px;}
+.chart-wrap{position:relative;height:220px;}
 
-/* KPI row debajo del gráfico */
-.kpi-row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
-.kpi-box{flex:1;min-width:80px;background:#f8f6f2;border-radius:4px;padding:6px 8px;text-align:center;}
-.kpi-box .val{font-size:16px;font-weight:700;}
-.kpi-box .lbl{font-size:8px;text-transform:uppercase;color:#888;letter-spacing:0.3px;margin-top:1px;}
+.kpi-row{display:flex;gap:6px;margin-top:6px;}
+.kpi-box{flex:1;background:#f8f6f2;border-radius:4px;padding:5px 6px;text-align:center;}
+.kpi-box .val{font-size:13px;font-weight:700;}
+.kpi-box .lbl{font-size:8px;text-transform:uppercase;color:#888;letter-spacing:0.3px;}
 .kpi-box.verde .val{color:#27ae60;}
 .kpi-box.rojo  .val{color:#e74c3c;}
 .kpi-box.total .val{color:#695F58;}
-
-/* Sin datos */
-.no-data{text-align:center;padding:40px;color:#aaa;font-size:11px;}
 </style>
 </head>
 <body>
 <div class="app">
 
 <div class="hdr">
+  <a href="index.html" class="btn-nav">← Tabla</a>
   <div class="hdr-title">
-    DESVÍOS POR ZONA — EQUIPOS CEMA
-    <small id="last-update">Última actualización: 27/07/2026 00:01 hrs</small>
+    DESVÍOS POR PREDIO — EQUIPOS CEMA
+    <small id="last-update">Última actualización: 27/07/2026 00:12 hrs</small>
   </div>
-  <a href="index.html" style="border:1px solid rgba(255,255,255,0.5);background:transparent;color:#fff;padding:4px 12px;border-radius:3px;cursor:pointer;font-size:11px;text-decoration:none;">← Tabla</a>
   <div class="logo">arauco</div>
 </div>
 
 <div class="filters">
-  <div class="fgrp">
-    <label>MES</label>
-    <select id="f-mes" onchange="renderAll()">
-      <option value="">Todos</option>
-    </select>
-  </div>
-  <div class="fgrp">
-    <label>TEAM</label>
-    <select id="f-team" onchange="renderAll()">
-      <option value="">Todos</option>
-    </select>
-  </div>
-  <div class="fgrp">
-    <label>PENDIENTE</label>
-    <select id="f-pend" onchange="renderAll()">
-      <option value="">Todos</option>
-    </select>
-  </div>
-  <div class="fgrp">
-    <label>ESTADO PLAN</label>
-    <select id="f-sp" onchange="renderAll()">
-      <option value="">Todos</option>
-    </select>
-  </div>
+  <div class="fgrp"><label>MES</label><select id="f-mes" onchange="renderAll()"><option value="">Todos</option></select></div>
+  <div class="fgrp"><label>TEAM</label><select id="f-team" onchange="renderAll()"><option value="">Todos</option></select></div>
+  <div class="fgrp"><label>PENDIENTE</label><select id="f-pend" onchange="renderAll()"><option value="">Todos</option></select></div>
+  <div class="fgrp"><label>ESTADO PLAN</label><select id="f-sp" onchange="renderAll()"><option value="">Todos</option></select></div>
   <button class="btn-clear" onclick="clearFilters()">Quitar Filtros</button>
 </div>
 
@@ -92,10 +63,10 @@ canvas{width:100%!important;}
 
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
 (async function(){
 
-// Actualizar fecha
 fetch('https://api.github.com/repos/mtureo-glitch/Diagonal-pendientes/commits?path=data.json&per_page=1&t='+Date.now())
   .then(r=>r.json()).then(cs=>{
     if(cs&&cs[0]&&cs[0].commit){
@@ -106,46 +77,40 @@ fetch('https://api.github.com/repos/mtureo-glitch/Diagonal-pendientes/commits?pa
   }).catch(()=>{});
 
 const D = await fetch('data.json').then(r=>r.json());
+const MESES_ORD=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
-// Solo CEMA (UC index 0) con desvio VERDE(2) o ROJO(0)
-const ROWS = D.rows.filter(r=>r[11]===0 && (r[8]===0||r[8]===2)).map(r=>({
+// Solo CEMA, VERDE(2) o ROJO(0)
+const ROWS = D.rows.filter(r=>r[11]===0&&(r[8]===0||r[8]===2)).map(r=>({
   zona:  D.Z[r[0]],
-  mes:   r[13]>=0?D.MES[r[13]]:'Sin fecha',
+  predio:D.P[r[3]],
   tnom:  D.TN[r[10]],
+  mes:   r[13]>=0?D.MES[r[13]]:'',
   pend:  r[19]>=0?D.PEND[r[19]]:'',
   sp:    r[14]>=0?D.SP[r[14]]:'',
-  dev:   r[8],   // 0=ROJO, 2=VERDE
+  dev:   r[8],
   vol:   r[12]
 }));
 
-const ZONAS = [...new Set(ROWS.map(r=>r.zona))].sort();
-const MESES_ORD = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const ZONAS=[...new Set(ROWS.map(r=>r.zona))].sort();
 
-// Poblar selects
-function populate(id, vals){
-  const sel = document.getElementById(id);
-  vals.forEach(v=>{
-    const o = document.createElement('option');
-    o.value=v; o.textContent=v; sel.appendChild(o);
-  });
+// Poblar filtros
+function populate(id,vals){
+  const s=document.getElementById(id);
+  vals.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;s.appendChild(o);});
 }
-const mesesDisp = MESES_ORD.filter(m=>ROWS.some(r=>r.mes===m));
-populate('f-mes', mesesDisp);
-populate('f-team', [...new Set(ROWS.map(r=>r.tnom))].sort((a,b)=>a.localeCompare(b)));
-populate('f-pend', [...new Set(ROWS.map(r=>r.pend).filter(Boolean))].sort());
-populate('f-sp',  [...new Set(ROWS.map(r=>r.sp).filter(Boolean))].sort());
+populate('f-mes',MESES_ORD.filter(m=>ROWS.some(r=>r.mes===m)));
+populate('f-team',[...new Set(ROWS.map(r=>r.tnom))].sort((a,b)=>a.localeCompare(b)));
+populate('f-pend',[...new Set(ROWS.map(r=>r.pend).filter(Boolean))].sort());
+populate('f-sp',[...new Set(ROWS.map(r=>r.sp).filter(Boolean))].sort());
 
 function getFiltered(){
-  const mes  = document.getElementById('f-mes').value;
-  const team = document.getElementById('f-team').value;
-  const pend = document.getElementById('f-pend').value;
-  const sp   = document.getElementById('f-sp').value;
+  const mes=document.getElementById('f-mes').value;
+  const team=document.getElementById('f-team').value;
+  const pend=document.getElementById('f-pend').value;
+  const sp=document.getElementById('f-sp').value;
   return ROWS.filter(r=>
-    (!mes  || r.mes===mes) &&
-    (!team || r.tnom===team) &&
-    (!pend || r.pend===pend) &&
-    (!sp   || r.sp===sp)
-  );
+    (!mes||r.mes===mes)&&(!team||r.tnom===team)&&
+    (!pend||r.pend===pend)&&(!sp||r.sp===sp));
 }
 
 function clearFilters(){
@@ -153,104 +118,117 @@ function clearFilters(){
   renderAll();
 }
 
-const fmt = n => n>=1e6 ? (n/1e6).toFixed(2)+'M' : n>=1e3 ? (n/1e3).toFixed(1)+'K' : Math.round(n).toLocaleString('es-CL');
-const fmtFull = n => n.toLocaleString('es-CL',{minimumFractionDigits:0,maximumFractionDigits:0});
-
-// Guardar referencias a Chart instances para destruir antes de redibujar
-const chartInstances = {};
+const fmt=n=>n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':Math.round(n).toLocaleString('es-CL');
+const fmtFull=n=>Math.round(n).toLocaleString('es-CL');
+const chartInst={};
 
 function renderAll(){
-  const filtered = getFiltered();
-  const area = document.getElementById('charts-area');
-  
-  // Crear/mantener cards por zona
-  ZONAS.forEach(zona=>{
-    const zRows = filtered.filter(r=>r.zona===zona);
-    const verde = zRows.filter(r=>r.dev===2);
-    const rojo  = zRows.filter(r=>r.dev===0);
-    const volVerde = verde.reduce((s,r)=>s+r.vol,0);
-    const volRojo  = rojo.reduce((s,r)=>s+r.vol,0);
+  const filtered=getFiltered();
+  const area=document.getElementById('charts-area');
 
-    let card = document.getElementById('card-'+zona.replace(/[^a-z]/gi,'_'));
+  ZONAS.forEach(zona=>{
+    const zRows=filtered.filter(r=>r.zona===zona);
+    const zid=zona.replace(/[^a-z]/gi,'_');
+
+    // Agrupar por predio
+    const byPredio={};
+    zRows.forEach(r=>{
+      if(!byPredio[r.predio]) byPredio[r.predio]={verde:0,rojo:0,teams:new Set()};
+      byPredio[r.predio].teams.add(r.tnom);
+      if(r.dev===2) byPredio[r.predio].verde+=r.vol;
+      else          byPredio[r.predio].rojo +=r.vol;
+    });
+
+    // Ordenar por vol total desc, top 15
+    const predios=Object.entries(byPredio)
+      .sort((a,b)=>(b[1].verde+b[1].rojo)-(a[1].verde+a[1].rojo))
+      .slice(0,15);
+
+    const labels=predios.map(([p,d])=>p.length>18?p.slice(0,16)+'…':p);
+    const fullLabels=predios.map(([p])=>p);
+    const teamLabels=predios.map(([,d])=>[...d.teams].join(', '));
+    const dataVerde=predios.map(([,d])=>Math.round(d.verde));
+    const dataRojo =predios.map(([,d])=>Math.round(d.rojo));
+    const volVerde=predios.reduce((s,[,d])=>s+d.verde,0);
+    const volRojo =predios.reduce((s,[,d])=>s+d.rojo,0);
+
+    // Crear card si no existe
+    let card=document.getElementById('card-'+zid);
     if(!card){
-      card = document.createElement('div');
+      card=document.createElement('div');
       card.className='zone-card';
-      card.id='card-'+zona.replace(/[^a-z]/gi,'_');
+      card.id='card-'+zid;
       card.innerHTML=`
         <div class="zone-header">
           <span>Zona ${zona}</span>
-          <span class="kpis">
-            <span class="kpi-v" id="kv-${zona.replace(/[^a-z]/gi,'_')}"></span>
-            <span class="kpi-r" id="kr-${zona.replace(/[^a-z]/gi,'_')}"></span>
+          <span class="zone-kpis">
+            <span class="kpi-v" id="kv-${zid}"></span>
+            <span class="kpi-r" id="kr-${zid}"></span>
           </span>
         </div>
         <div class="chart-body">
-          <div class="chart-wrap"><canvas id="cv-${zona.replace(/[^a-z]/gi,'_')}"></canvas></div>
+          <div class="chart-wrap"><canvas id="cv-${zid}"></canvas></div>
           <div class="kpi-row">
-            <div class="kpi-box verde"><div class="val" id="kpiv-${zona.replace(/[^a-z]/gi,'_')}">—</div><div class="lbl">🟢 GANA (m³)</div></div>
-            <div class="kpi-box rojo"><div class="val" id="kpir-${zona.replace(/[^a-z]/gi,'_')}">—</div><div class="lbl">🔴 PIERDE (m³)</div></div>
-            <div class="kpi-box total"><div class="val" id="kpit-${zona.replace(/[^a-z]/gi,'_')}">—</div><div class="lbl">TOTAL (m³)</div></div>
+            <div class="kpi-box verde"><div class="val" id="kpiv-${zid}">—</div><div class="lbl">🟢 GANA (m³)</div></div>
+            <div class="kpi-box rojo"><div class="val" id="kpir-${zid}">—</div><div class="lbl">🔴 PIERDE (m³)</div></div>
+            <div class="kpi-box total"><div class="val" id="kpit-${zid}">—</div><div class="lbl">TOTAL (m³)</div></div>
           </div>
         </div>`;
       area.appendChild(card);
     }
 
-    const zid = zona.replace(/[^a-z]/gi,'_');
-    document.getElementById('kv-'+zid).textContent = '🟢 '+verde.length+' ('+fmt(volVerde)+')';
-    document.getElementById('kr-'+zid).textContent = '🔴 '+rojo.length+' ('+fmt(volRojo)+')';
-    document.getElementById('kpiv-'+zid).textContent = fmtFull(volVerde);
-    document.getElementById('kpir-'+zid).textContent = fmtFull(volRojo);
-    document.getElementById('kpit-'+zid).textContent = fmtFull(volVerde+volRojo);
+    document.getElementById('kv-'+zid).textContent='🟢 '+fmtFull(volVerde)+' m³';
+    document.getElementById('kr-'+zid).textContent='🔴 '+fmtFull(volRojo)+' m³';
+    document.getElementById('kpiv-'+zid).textContent=fmtFull(volVerde);
+    document.getElementById('kpir-'+zid).textContent=fmtFull(volRojo);
+    document.getElementById('kpit-'+zid).textContent=fmtFull(volVerde+volRojo);
 
-    // Agrupar por TEAM para el gráfico de barras
-    const byTeam = {};
-    zRows.forEach(r=>{
-      if(!byTeam[r.tnom]) byTeam[r.tnom]={verde:0,rojo:0};
-      if(r.dev===2) byTeam[r.tnom].verde+=r.vol;
-      else          byTeam[r.tnom].rojo +=r.vol;
-    });
-    const labels = Object.keys(byTeam).sort((a,b)=>{
-      const ta=(byTeam[a].verde+byTeam[a].rojo), tb=(byTeam[b].verde+byTeam[b].rojo);
-      return tb-ta;
-    }).slice(0,12); // top 12
+    if(chartInst[zid]) chartInst[zid].destroy();
 
-    const dataVerde = labels.map(t=>Math.round(byTeam[t].verde));
-    const dataRojo  = labels.map(t=>Math.round(byTeam[t].rojo));
-
-    // Destruir chart anterior si existe
-    if(chartInstances[zid]){ chartInstances[zid].destroy(); }
-
-    const ctx = document.getElementById('cv-'+zid).getContext('2d');
-    chartInstances[zid] = new Chart(ctx, {
+    const ctx=document.getElementById('cv-'+zid).getContext('2d');
+    chartInst[zid]=new Chart(ctx,{
       type:'bar',
       data:{
         labels,
         datasets:[
-          {label:'GANA (m³)', data:dataVerde, backgroundColor:'#27ae60', borderRadius:3, barPercentage:0.7},
-          {label:'PIERDE (m³)',data:dataRojo,  backgroundColor:'#e74c3c', borderRadius:3, barPercentage:0.7}
+          {label:'GANA (m³)',   data:dataVerde, backgroundColor:'#27ae60', borderRadius:3, barPercentage:0.75},
+          {label:'PIERDE (m³)', data:dataRojo,  backgroundColor:'#e74c3c', borderRadius:3, barPercentage:0.75}
         ]
       },
       options:{
         responsive:true, maintainAspectRatio:false,
         plugins:{
-          legend:{position:'top',labels:{font:{size:10},boxWidth:12,padding:8}},
-          tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString('es-CL')} m³`}}
+          legend:{position:'top',labels:{font:{size:9},boxWidth:10,padding:6}},
+          tooltip:{
+            callbacks:{
+              title:items=>{
+                const i=items[0].dataIndex;
+                return fullLabels[i]+'\nTeam: '+teamLabels[i];
+              },
+              label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString('es-CL')} m³`
+            }
+          }
         },
         scales:{
-          x:{ticks:{font:{size:9},maxRotation:35},grid:{display:false}},
-          y:{ticks:{font:{size:9},callback:v=>fmt(v)},grid:{color:'#f0eeeb'}}
+          x:{
+            ticks:{
+              font:{size:8},
+              maxRotation:40,
+              callback:function(val,i){
+                // Etiqueta predio + team abajo
+                return [labels[i], teamLabels[i]?.length>12?teamLabels[i].slice(0,10)+'…':teamLabels[i]];
+              }
+            },
+            grid:{display:false}
+          },
+          y:{ticks:{font:{size:8},callback:v=>fmt(v)},grid:{color:'#f0eeeb'}}
         }
       }
     });
   });
 }
 
-// Cargar Chart.js dinámicamente
-const script = document.createElement('script');
-script.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
-script.onload = ()=>renderAll();
-document.head.appendChild(script);
-
+renderAll();
 window.renderAll=renderAll;
 window.clearFilters=clearFilters;
 
