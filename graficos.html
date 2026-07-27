@@ -319,23 +319,24 @@ const negNomPlugin={
     chart.getDatasetMeta(0).data.forEach((bar,i)=>{
       const lbl=chart._fullLabels?.[i]||'';
       if(!negNomSet.has('negnom:'+lbl)) return;
-      // Dibujar etiqueta NEG. NOM sobre la barra
+      // Dibujar etiqueta NEG. NOM en el centro de la barra
       const text='NEG. NOM';
+      const barTop=bar.y;
+      const barBottom=chart.scales.y.getPixelForValue(0);
+      const barMidY=(barTop+barBottom)/2;
       ctx.font='bold 9px Segoe UI';
       const tw=ctx.measureText(text).width;
-      ctx.fillStyle='rgba(105,95,88,0.92)';
+      const rw=tw+12, rh=17;
+      const rx=bar.x-rw/2, ry=barMidY-rh/2;
+      // Fondo redondeado
+      ctx.fillStyle='rgba(105,95,88,0.88)';
       ctx.beginPath();
-      const rx=bar.x-tw/2-5, ry=bar.y-26, rw=tw+10, rh=16;
-      ctx.roundRect(rx,ry,rw,rh,3);
+      ctx.roundRect(rx,ry,rw,rh,4);
       ctx.fill();
+      // Texto blanco centrado
       ctx.fillStyle='#fff';
       ctx.textAlign='center'; ctx.textBaseline='middle';
-      ctx.fillText(text, bar.x, ry+rh/2);
-      // Flecha hacia abajo
-      ctx.fillStyle='rgba(105,95,88,0.92)';
-      ctx.beginPath();
-      ctx.moveTo(bar.x-5,ry+rh); ctx.lineTo(bar.x+5,ry+rh); ctx.lineTo(bar.x,ry+rh+5);
-      ctx.fill();
+      ctx.fillText(text, bar.x, barMidY);
     });
     ctx.restore();
   }
