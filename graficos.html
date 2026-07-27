@@ -285,7 +285,7 @@ Team: ${teamLbls[items[0].dataIndex]}`,
   return ch;
 }
 
-function getPredios(zona, filtered){
+function getPredios(zona, filtered, devF){
   const byP={};
   filtered.filter(r=>r.zona===zona).forEach(r=>{
     if(!byP[r.predio]) byP[r.predio]={verde:0,rojo:0,teams:new Set()};
@@ -293,7 +293,11 @@ function getPredios(zona, filtered){
     if(r.dev===2) byP[r.predio].verde+=r.vol;
     else          byP[r.predio].rojo +=r.vol;
   });
-  return Object.entries(byP).sort((a,b)=>(b[1].verde+b[1].rojo)-(a[1].verde+a[1].rojo));
+  return Object.entries(byP).sort((a,b)=>{
+    if(devF==='2') return b[1].verde-a[1].verde;
+    if(devF==='0') return b[1].rojo-a[1].rojo;
+    return (b[1].verde+b[1].rojo)-(a[1].verde+a[1].rojo);
+  });
 }
 
 function renderAll(){
@@ -303,10 +307,10 @@ function renderAll(){
 
   ZONAS.forEach(zona=>{
     const zid=zona.replace(/[^a-z]/gi,'_');
-    const predios=getPredios(zona,filtered).slice(0,15);
+    const predios=getPredios(zona,filtered,devF).slice(0,15);
     const volV=predios.reduce((s,[,d])=>s+d.verde,0);
     const volR=predios.reduce((s,[,d])=>s+d.rojo,0);
-    zoneCache[zona]={predios:getPredios(zona,filtered), devF};
+    zoneCache[zona]={predios:getPredios(zona,filtered,devF), devF};
 
     let card=document.getElementById('card-'+zid);
     if(!card){
