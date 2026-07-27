@@ -28,7 +28,8 @@ body{background:#f0efec;color:#1a1a1a;font-size:12px;overflow:hidden;height:100v
 .kpi-v{color:#7ddb7d;font-weight:700;}
 .kpi-r{color:#ff9090;font-weight:700;}
 .chart-body{padding:8px 10px 10px;}
-.chart-wrap{position:relative;height:220px;}
+/* altura fija para que quepan etiquetas + barras */
+.chart-wrap{position:relative;height:240px;}
 
 .kpi-row{display:flex;gap:6px;margin-top:6px;}
 .kpi-box{flex:1;background:#f8f6f2;border-radius:4px;padding:5px 6px;text-align:center;}
@@ -46,21 +47,30 @@ body{background:#f0efec;color:#1a1a1a;font-size:12px;overflow:hidden;height:100v
   <a href="index.html" class="btn-nav">← Tabla</a>
   <div class="hdr-title">
     DESVÍOS POR PREDIO — EQUIPOS CEMA
-    <small id="last-update">Última actualización: 27/07/2026 00:12 hrs</small>
+    <small id="last-update">Última actualización: 27/07/2026 00:23 hrs</small>
   </div>
   <div class="logo">arauco</div>
 </div>
 
 <div class="filters">
-  <div class="fgrp"><label>MES</label><select id="f-mes" onchange="renderAll()"><option value="">Todos</option></select></div>
-  <div class="fgrp"><label>TEAM</label><select id="f-team" onchange="renderAll()"><option value="">Todos</option></select></div>
-  <div class="fgrp"><label>PENDIENTE</label><select id="f-pend" onchange="renderAll()"><option value="">Todos</option></select></div>
-  <div class="fgrp"><label>ESTADO PLAN</label><select id="f-sp" onchange="renderAll()"><option value="">Todos</option></select></div>
+  <div class="fgrp"><label>MES</label>
+    <select id="f-mes" onchange="renderAll()"><option value="">Todos</option></select></div>
+  <div class="fgrp"><label>TEAM</label>
+    <select id="f-team" onchange="renderAll()"><option value="">Todos</option></select></div>
+  <div class="fgrp"><label>PENDIENTE</label>
+    <select id="f-pend" onchange="renderAll()"><option value="">Todos</option></select></div>
+  <div class="fgrp"><label>ESTADO PLAN</label>
+    <select id="f-sp" onchange="renderAll()"><option value="">Todos</option></select></div>
+  <div class="fgrp"><label>ESTADO</label>
+    <select id="f-dev" onchange="renderAll()">
+      <option value="">Verde + Rojo</option>
+      <option value="2">🟢 Verde (GANA)</option>
+      <option value="0">🔴 Rojo (PIERDE)</option>
+    </select></div>
   <button class="btn-clear" onclick="clearFilters()">Quitar Filtros</button>
 </div>
 
 <div class="charts-area" id="charts-area"></div>
-
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -79,7 +89,6 @@ fetch('https://api.github.com/repos/mtureo-glitch/Diagonal-pendientes/commits?pa
 const D = await fetch('data.json').then(r=>r.json());
 const MESES_ORD=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
-// Solo CEMA, VERDE(2) o ROJO(0)
 const ROWS = D.rows.filter(r=>r[11]===0&&(r[8]===0||r[8]===2)).map(r=>({
   zona:  D.Z[r[0]],
   predio:D.P[r[3]],
@@ -93,7 +102,6 @@ const ROWS = D.rows.filter(r=>r[11]===0&&(r[8]===0||r[8]===2)).map(r=>({
 
 const ZONAS=[...new Set(ROWS.map(r=>r.zona))].sort();
 
-// Poblar filtros
 function populate(id,vals){
   const s=document.getElementById(id);
   vals.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;s.appendChild(o);});
@@ -108,29 +116,64 @@ function getFiltered(){
   const team=document.getElementById('f-team').value;
   const pend=document.getElementById('f-pend').value;
   const sp=document.getElementById('f-sp').value;
+  const dev=document.getElementById('f-dev').value;
   return ROWS.filter(r=>
     (!mes||r.mes===mes)&&(!team||r.tnom===team)&&
-    (!pend||r.pend===pend)&&(!sp||r.sp===sp));
+    (!pend||r.pend===pend)&&(!sp||r.sp===sp)&&
+    (dev===''||String(r.dev)===dev));
 }
 
 function clearFilters(){
-  ['f-mes','f-team','f-pend','f-sp'].forEach(id=>document.getElementById(id).value='');
+  ['f-mes','f-team','f-pend','f-sp','f-dev'].forEach(id=>document.getElementById(id).value='');
   renderAll();
 }
 
 const fmt=n=>n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':Math.round(n).toLocaleString('es-CL');
 const fmtFull=n=>Math.round(n).toLocaleString('es-CL');
+
+// Plugin personalizado para etiquetas fijas encima de barras (team + m3)
+const labelPlugin = {
+  id:'barLabels',
+  afterDatasetsDraw(chart){
+    const {ctx,data,scales:{x,y}}=chart;
+    ctx.save();
+    data.datasets.forEach((ds,di)=>{
+      chart.getDatasetMeta(di).data.forEach((bar,i)=>{
+        const val=ds.data[i];
+        if(!val||val===0) return;
+        const teams=chart._teamLabels?.[i]||'';
+        const color=di===0?'#1a7d3a':'#a01010';
+        ctx.fillStyle=color;
+        ctx.font='bold 8px Segoe UI';
+        ctx.textAlign='center';
+        ctx.textBaseline='bottom';
+        // m3 encima de la barra
+        const m3str=fmt(val);
+        ctx.fillText(m3str, bar.x, bar.y-2);
+        // team name debajo del m3
+        if(teams){
+          ctx.font='7px Segoe UI';
+          ctx.fillStyle='#555';
+          ctx.fillText(teams.length>10?teams.slice(0,9)+'…':teams, bar.x, bar.y-11);
+        }
+      });
+    });
+    ctx.restore();
+  }
+};
+Chart.register(labelPlugin);
+
 const chartInst={};
 
 function renderAll(){
   const filtered=getFiltered();
+  const devFilter=document.getElementById('f-dev').value;
   const area=document.getElementById('charts-area');
 
   ZONAS.forEach(zona=>{
     const zRows=filtered.filter(r=>r.zona===zona);
     const zid=zona.replace(/[^a-z]/gi,'_');
 
-    // Agrupar por predio
     const byPredio={};
     zRows.forEach(r=>{
       if(!byPredio[r.predio]) byPredio[r.predio]={verde:0,rojo:0,teams:new Set()};
@@ -139,12 +182,11 @@ function renderAll(){
       else          byPredio[r.predio].rojo +=r.vol;
     });
 
-    // Ordenar por vol total desc, top 15
     const predios=Object.entries(byPredio)
       .sort((a,b)=>(b[1].verde+b[1].rojo)-(a[1].verde+a[1].rojo))
       .slice(0,15);
 
-    const labels=predios.map(([p,d])=>p.length>18?p.slice(0,16)+'…':p);
+    const labels=predios.map(([p])=>p.length>16?p.slice(0,14)+'…':p);
     const fullLabels=predios.map(([p])=>p);
     const teamLabels=predios.map(([,d])=>[...d.teams].join(', '));
     const dataVerde=predios.map(([,d])=>Math.round(d.verde));
@@ -152,7 +194,13 @@ function renderAll(){
     const volVerde=predios.reduce((s,[,d])=>s+d.verde,0);
     const volRojo =predios.reduce((s,[,d])=>s+d.rojo,0);
 
-    // Crear card si no existe
+    // Datasets según filtro de estado
+    let datasets=[];
+    if(devFilter===''||devFilter==='2')
+      datasets.push({label:'GANA (m³)',data:dataVerde,backgroundColor:'#27ae60',borderRadius:3,barPercentage:0.7});
+    if(devFilter===''||devFilter==='0')
+      datasets.push({label:'PIERDE (m³)',data:dataRojo,backgroundColor:'#e74c3c',borderRadius:3,barPercentage:0.7});
+
     let card=document.getElementById('card-'+zid);
     if(!card){
       card=document.createElement('div');
@@ -186,45 +234,35 @@ function renderAll(){
     if(chartInst[zid]) chartInst[zid].destroy();
 
     const ctx=document.getElementById('cv-'+zid).getContext('2d');
-    chartInst[zid]=new Chart(ctx,{
+    const chart=new Chart(ctx,{
       type:'bar',
-      data:{
-        labels,
-        datasets:[
-          {label:'GANA (m³)',   data:dataVerde, backgroundColor:'#27ae60', borderRadius:3, barPercentage:0.75},
-          {label:'PIERDE (m³)', data:dataRojo,  backgroundColor:'#e74c3c', borderRadius:3, barPercentage:0.75}
-        ]
-      },
+      data:{labels,datasets},
       options:{
-        responsive:true, maintainAspectRatio:false,
+        responsive:true,
+        maintainAspectRatio:false,
+        layout:{padding:{top:28}},
         plugins:{
           legend:{position:'top',labels:{font:{size:9},boxWidth:10,padding:6}},
           tooltip:{
             callbacks:{
-              title:items=>{
-                const i=items[0].dataIndex;
-                return fullLabels[i]+'\nTeam: '+teamLabels[i];
-              },
-              label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString('es-CL')} m³`
+              title:items=>`${fullLabels[items[0].dataIndex]}
+Team: ${teamLabels[items[0].dataIndex]}`,
+              label:c=>`${c.dataset.label}: ${c.parsed.y.toLocaleString('es-CL')} m³`
             }
           }
         },
         scales:{
           x:{
-            ticks:{
-              font:{size:8},
-              maxRotation:40,
-              callback:function(val,i){
-                // Etiqueta predio + team abajo
-                return [labels[i], teamLabels[i]?.length>12?teamLabels[i].slice(0,10)+'…':teamLabels[i]];
-              }
-            },
+            ticks:{font:{size:8},maxRotation:35,autoSkip:false},
             grid:{display:false}
           },
           y:{ticks:{font:{size:8},callback:v=>fmt(v)},grid:{color:'#f0eeeb'}}
         }
       }
     });
+    // Guardar teamLabels en la instancia para el plugin
+    chart._teamLabels=teamLabels;
+    chartInst[zid]=chart;
   });
 }
 
