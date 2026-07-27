@@ -130,30 +130,30 @@ const D = await fetch('data.json').then(r=>r.json());
 const MESES_ORD=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
 // Solo CEMA, VERDE(2) o ROJO(0)
-// Lógica desvío gráfico: EQUIPO ARCGIS (planificado) vs PENDIENTE (pestaña Team)
-const COSTO_EP={
-  'SK.GRAPPLE':1,'SK.HUINCHE':1,'SK.HUINCHE MEC':1,
-  'FW.HUINCHE':2,'ANIMALES':2,
-  'TORRE':3
-};
+// Lógica desvío gráfico (dos reglas independientes):
+// VERDE: EQUIPO ARCGIS más barato que PENDIENTE team → GANA
+// ROJO:  EQUIPO ACTA más caro que EQUIPO ARCGIS → PIERDE (igual que dash)
+// Una misma fila puede contribuir a VERDE y a ROJO de un predio
+const COSTO_EP={'SK.GRAPPLE':1,'SK.HUINCHE':1,'SK.HUINCHE MEC':1,'FW.HUINCHE':2,'ANIMALES':2,'TORRE':3};
+const COSTO_ER={'SKGR':1,'SKHU':1,'FORW':1,'AMOV':1,'FOWI':2,'GRWI':2,'ANIM':2,'T500':3,'T400':3};
 const COSTO_PEND={'0-35% Asist':1,'0-35% Astillador':1,'Asistido':2,'Remate':2,'Torre Mecanizada':3};
 
-const ROWS = D.rows.filter(r=>r[11]===0).map(r=>{
+// Construir ROWS con dos entradas por fila cuando aplica ambas reglas
+const ROWS_RAW = [];
+D.rows.filter(r=>r[11]===0).forEach(r=>{
   const pend=r[19]>=0?D.PEND[r[19]]:'';
-  const ep  =r[6]>=0?D.EP[r[6]]:'';   // EQUIPO ARCGIS planificado
-  const cp  =COSTO_PEND[pend];
-  const ce  =COSTO_EP[ep];
-  let devG=null;
-  if(cp&&ce){
-    if(ce<cp) devG=2;      // VERDE: arcgis más barato que pendiente = GANA
-    else if(ce>cp) devG=0; // ROJO:  arcgis más caro  que pendiente = PIERDE
-  }
-  return {
-    zona:D.Z[r[0]], predio:D.P[r[3]], tnom:D.TN[r[10]],
-    mes: r[13]>=0?D.MES[r[13]]:'', pend,
-    sp:  r[14]>=0?D.SP[r[14]]:'', dev:devG, vol:r[12]
-  };
-}).filter(r=>r.dev!==null);
+  const ep  =r[6]>=0?D.EP[r[6]]:'';
+  const er  =r[7]>=0?D.ER[r[7]]:'';
+  const cp  =COSTO_PEND[pend], ce=COSTO_EP[ep], cr=COSTO_ER[er];
+  const base={zona:D.Z[r[0]],predio:D.P[r[3]],tnom:D.TN[r[10]],
+              mes:r[13]>=0?D.MES[r[13]]:'',pend,
+              sp:r[14]>=0?D.SP[r[14]]:'',vol:r[12]};
+  // VERDE: arcgis más barato que pendiente
+  if(cp&&ce&&ce<cp) ROWS_RAW.push({...base,dev:2});
+  // ROJO: acta más caro que arcgis (independiente)
+  if(ce&&cr&&cr>ce) ROWS_RAW.push({...base,dev:0});
+});
+const ROWS=ROWS_RAW;
 
 const ZONAS=[...new Set(ROWS.map(r=>r.zona))].sort();
 
