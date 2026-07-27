@@ -211,8 +211,7 @@ function getFiltered(){
     (!mes  || r.mes===mes) &&
     (!team || r.tnom===team) &&
     (pends.size===0 || pends.has(r.pend)) &&
-    (!sp   || r.sp===sp) &&
-    (dev==='' || String(r.dev)===dev)
+    (!sp   || r.sp===sp)
   );
 }
 
