@@ -68,11 +68,11 @@ body{background:#f0efec;color:#1a1a1a;font-size:12px;overflow:hidden;height:100v
   <div class="filters">
     <div class="fgrp">
       <label>MES</label>
-      <select id="f-mes" onchange="renderAll()"><option value="">Todos</option></select>
+      <select id="f-mes"><option value="">Todos</option></select>
     </div>
     <div class="fgrp">
       <label>TEAM</label>
-      <select id="f-team" onchange="renderAll()"><option value="">Todos</option></select>
+      <select id="f-team"><option value="">Todos</option></select>
     </div>
     <div class="fgrp">
       <label>PENDIENTE</label>
@@ -86,17 +86,17 @@ body{background:#f0efec;color:#1a1a1a;font-size:12px;overflow:hidden;height:100v
     </div>
     <div class="fgrp">
       <label>ESTADO PLAN</label>
-      <select id="f-sp" onchange="renderAll()"><option value="">Todos</option></select>
+      <select id="f-sp"><option value="">Todos</option></select>
     </div>
     <div class="fgrp">
       <label>ESTADO</label>
-      <select id="f-dev" onchange="renderAll()">
+      <select id="f-dev">
         <option value="">Verde + Rojo</option>
         <option value="2">🟢 Verde (GANA)</option>
         <option value="0">🔴 Rojo (PIERDE)</option>
       </select>
     </div>
-    <button class="btn-clear" onclick="clearAllFilters()">Quitar Filtros</button>
+    <button class="btn-clear">Quitar Filtros</button>
   </div>
 
   <div class="charts-area" id="charts-area"></div>
@@ -146,6 +146,12 @@ function addOpts(id,vals){
 addOpts('f-mes', MESES_ORD.filter(m=>ROWS.some(r=>r.mes===m)));
 addOpts('f-team', [...new Set(ROWS.map(r=>r.tnom))].sort((a,b)=>a.localeCompare(b)));
 addOpts('f-sp',  [...new Set(ROWS.map(r=>r.sp).filter(Boolean))].sort());
+
+// Bind select events
+['f-mes','f-team','f-sp','f-dev'].forEach(id=>{
+  document.getElementById(id).addEventListener('change', ()=>renderAll());
+});
+document.querySelector('.btn-clear').addEventListener('click', ()=>clearAllFilters());
 
 // Multiselect PENDIENTE
 const pendVals = [...new Set(ROWS.map(r=>r.pend).filter(Boolean))].sort();
@@ -378,6 +384,9 @@ document.getElementById('modal-bg').addEventListener('click',e=>{
 });
 
 renderAll();
+window.renderAll=renderAll;
+window.clearAllFilters=clearAllFilters;
+window.openModal=openModal;
 })();
 </script>
 </body>
