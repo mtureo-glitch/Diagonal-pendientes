@@ -292,6 +292,44 @@ const chartInst={};
 let modalInst=null;
 const zoneCache={};
 
+function buildChartSingle(canvas, predios, devF, compact){
+  // devF: 2=VERDE, 0=ROJO
+  const isV=devF===2;
+  const labels =predios.map(([p])=>p.length>14?p.slice(0,12)+'…':p);
+  const fullLbl=predios.map(([p])=>p);
+  const teamLbl=predios.map(([,d])=>[...(isV?d.teamsV:d.teamsR)||d.teams].join(', '));
+  const data   =predios.map(([,d])=>Math.round(isV?d.verde:d.rojo));
+  const color  =isV?'#27ae60':'#e74c3c';
+  const ch=new Chart(canvas.getContext('2d'),{
+    type:'bar',
+    data:{labels,datasets:[{
+      label:isV?'GANA (m³)':'PIERDE (m³)',
+      data, backgroundColor:color, borderRadius:3, barPercentage:0.75
+    }]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      layout:{padding:{top:30}},
+      plugins:{
+        legend:{display:false},
+        barLabels:{compact:true},
+        tooltip:{callbacks:{
+          title:items=>`${fullLbl[items[0].dataIndex]}
+Team: ${teamLbl[items[0].dataIndex]}`,
+          label:c=>`${c.dataset.label}: ${c.parsed.y.toLocaleString('es-CL')} m³`
+        }}
+      },
+      scales:{
+        x:{ticks:{font:{size:8},maxRotation:40,autoSkip:false},grid:{display:false}},
+        y:{ticks:{font:{size:8},callback:v=>fmt(v)},grid:{color:'#f0eeeb'}}
+      }
+    }
+  });
+  ch._teamLabels=teamLbl;
+  ch._teamLabelsV=teamLbl;
+  ch._teamLabelsR=teamLbl;
+  return ch;
+}
+
 function buildChart(canvas, predios, devF, compact){
   const labels  = predios.map(([p])=>p.length>16?p.slice(0,14)+'…':p);
   const fullLbls= predios.map(([p])=>p);
@@ -378,27 +416,44 @@ function renderAll(){
           <button class="btn-expand" data-zona="${zona}">⛶ Expandir</button>
         </div>
         <div class="chart-body">
-          <div class="chart-wrap"><canvas id="cv-${zid}"></canvas></div>
-          <div class="kpi-row">
-            <div class="kpi-box verde"><div class="val" id="kpiv-${zid}">—</div><div class="lbl">🟢 GANA (m³)</div></div>
-            <div class="kpi-box rojo"><div class="val" id="kpir-${zid}">—</div><div class="lbl">🔴 PIERDE (m³)</div></div>
-            <div class="kpi-box total"><div class="val" id="kpit-${zid}">—</div><div class="lbl">TOTAL (m³)</div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div>
+              <div style="font-size:9px;font-weight:700;color:#27ae60;text-align:center;margin-bottom:3px;">🟢 GANA</div>
+              <div class="chart-wrap"><canvas id="cv-v-${zid}"></canvas></div>
+              <div style="text-align:center;font-size:11px;font-weight:700;color:#27ae60;margin-top:4px;" id="kpiv-${zid}">—</div>
+            </div>
+            <div>
+              <div style="font-size:9px;font-weight:700;color:#e74c3c;text-align:center;margin-bottom:3px;">🔴 PIERDE</div>
+              <div class="chart-wrap"><canvas id="cv-r-${zid}"></canvas></div>
+              <div style="text-align:center;font-size:11px;font-weight:700;color:#e74c3c;margin-top:4px;" id="kpir-${zid}">—</div>
+            </div>
           </div>
         </div>`;
       card.querySelector('.btn-expand').addEventListener('click',()=>openModal(zona));
       area.appendChild(card);
     }
 
-    const showV=devF!=='0', showR=devF!=='2';
-    const dispV=showV?volV:0, dispR=showR?volR:0;
-    document.getElementById('kv-'+zid).textContent='🟢 '+fmtFull(dispV)+' m³';
-    document.getElementById('kr-'+zid).textContent='🔴 '+fmtFull(dispR)+' m³';
-    document.getElementById('kpiv-'+zid).textContent=fmtFull(dispV);
-    document.getElementById('kpir-'+zid).textContent=fmtFull(dispR);
-    document.getElementById('kpit-'+zid).textContent=fmtFull(dispV+dispR);
+    document.getElementById('kv-'+zid).textContent='🟢 '+fmtFull(volV)+' m³';
+    document.getElementById('kr-'+zid).textContent='🔴 '+fmtFull(volR)+' m³';
+    document.getElementById('kpiv-'+zid).textContent=fmtFull(volV);
+    document.getElementById('kpir-'+zid).textContent=fmtFull(volR);
 
-    if(chartInst[zid]) chartInst[zid].destroy();
-    chartInst[zid]=buildChart(document.getElementById('cv-'+zid), predios, devF, true);
+    // Destruir charts anteriores
+    if(chartInst[zid+'_v']) chartInst[zid+'_v'].destroy();
+    if(chartInst[zid+'_r']) chartInst[zid+'_r'].destroy();
+
+    // Gráfico VERDE (izquierda)
+    const prediosV=allP.filter(([,d])=>d.verde>0).slice(0,12);
+    const cvV=document.getElementById('cv-v-'+zid);
+    if(cvV && prediosV.length>0){
+      chartInst[zid+'_v']=buildChartSingle(cvV, prediosV, 2, compact=true);
+    }
+    // Gráfico ROJO (derecha)
+    const prediosR=allP.filter(([,d])=>d.rojo>0).slice(0,12);
+    const cvR=document.getElementById('cv-r-'+zid);
+    if(cvR && prediosR.length>0){
+      chartInst[zid+'_r']=buildChartSingle(cvR, prediosR, 0, compact=true);
+    }
   });
 }
 
@@ -410,7 +465,9 @@ function openModal(zona){
   if(modalInst){modalInst.destroy();modalInst=null;}
   const canvas=document.getElementById('modal-canvas');
   canvas.style.height='100%'; canvas.style.width='100%';
-  modalInst=buildChart(canvas, predios, devF, false);
+  // Modal: mostrar ambos en un solo gráfico agrupado
+  const allForModal=predios;
+  modalInst=buildChart(canvas, allForModal, devF, false);
 }
 
 document.getElementById('modal-close-btn').addEventListener('click',()=>{
