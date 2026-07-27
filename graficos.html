@@ -527,18 +527,28 @@ function renderAll(){
     if(chartInst[zid+'_v']) chartInst[zid+'_v'].destroy();
     if(chartInst[zid+'_r']) chartInst[zid+'_r'].destroy();
 
-    // Gráfico VERDE (izquierda)
+    const showV = devF===''||devF==='2';
+    const showR = devF===''||devF==='0';
+
+    // Gráfico VERDE (izquierda) — solo si filtro lo permite
     const prediosV=allP.filter(([,d])=>d.verde>0).slice(0,12);
     const cvV=document.getElementById('cv-v-'+zid);
-    if(cvV && prediosV.length>0){
-      chartInst[zid+'_v']=buildChartSingle(cvV, prediosV, 2, compact=true);
+    const wrapV=cvV?cvV.closest('div'):null;
+    if(wrapV) wrapV.parentElement.style.display=showV?'':'none';
+    if(cvV && prediosV.length>0 && showV){
+      chartInst[zid+'_v']=buildChartSingle(cvV, prediosV, 2, true);
     }
-    // Gráfico ROJO (derecha)
+    document.getElementById('kpiv-'+zid).style.display=showV?'':'none';
+
+    // Gráfico ROJO (derecha) — solo si filtro lo permite
     const prediosR=allP.filter(([,d])=>d.rojo>0).slice(0,12);
     const cvR=document.getElementById('cv-r-'+zid);
-    if(cvR && prediosR.length>0){
-      chartInst[zid+'_r']=buildChartSingle(cvR, prediosR, 0, compact=true);
+    const wrapR=cvR?cvR.closest('div'):null;
+    if(wrapR) wrapR.parentElement.style.display=showR?'':'none';
+    if(cvR && prediosR.length>0 && showR){
+      chartInst[zid+'_r']=buildChartSingle(cvR, prediosR, 0, true);
     }
+    document.getElementById('kpir-'+zid).style.display=showR?'':'none';
   });
 }
 
