@@ -104,9 +104,9 @@ if(window.location.hash !== '#arauco2026'){
     <div class="fgrp">
       <label>PENDIENTE</label>
       <div class="ms-wrap" id="ms-pend-wrap">
-        <div class="ms-btn" id="ms-pend-btn">Todos</div>
+        <div class="ms-btn" id="ms-pend-btn">Ninguna excluida</div>
         <div class="ms-dd" id="ms-pend-dd">
-          <div class="ms-dd-hdr">Seleccionar <span id="ms-pend-clear">Limpiar</span></div>
+          <div class="ms-dd-hdr">Excluir pendiente <span id="ms-pend-clear">Limpiar</span></div>
           <div id="ms-pend-items"></div>
         </div>
       </div>
@@ -238,7 +238,7 @@ document.getElementById('ms-pend-clear').addEventListener('click', e=>{
 function updatePendBtn(){
   const checked=[...document.querySelectorAll('#ms-pend-items input:checked')].map(c=>c.value);
   const btn=document.getElementById('ms-pend-btn');
-  btn.textContent = checked.length===0?'Todos': checked.length===1?checked[0]: checked.length+' seleccionados';
+  btn.textContent = checked.length===0?'Ninguna excluida': checked.length===1?'Excl: '+checked[0]: 'Excl: '+checked.length+' pendientes';
 }
 
 function getSelPends(){
@@ -260,7 +260,7 @@ function getFiltered(){
   return ROWS.filter(r=>
     (!mes  || r.mes===mes) &&
     (!team || r.tnom===team) &&
-    (pends.size===0 || pends.has(r.pend)) &&
+    (pends.size===0 || !pends.has(r.pend)) &&
     (!sp   || r.sp===sp)
   );
 }
