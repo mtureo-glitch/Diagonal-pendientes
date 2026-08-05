@@ -71,7 +71,7 @@ td.right-foot{text-align:right;font-weight:700;}
     DIAGONAL DE PENDIENTES
     <small id="last-update">Última actualización: 05/08/2026 11:56 hrs</small>
   </div>
-  <button class="btn-excel" onclick="exportExcel()">⬇ Excel</button>
+  <button class="btn-excel" onclick="window._exportExcel&&window._exportExcel()">⬇ Excel</button>
   <div class="logo" id="logo-secret" onclick="handleLogoClick()" style="cursor:default;" title="">arauco</div>
 <script>
 var _lc=0,_lt=0;
@@ -232,7 +232,7 @@ function applyFilters(){
 function refreshOptions(){
   const av={zona:new Set(),emp:new Set(),er:new Set(),int_:new Set(),mes:new Set(),
             uo:new Set(),ori:new Set(),acta:new Set(),ep:new Set(),sp:new Set(),
-            ea:new Set(),dev:new Set(),temp:new Set(),tnom:new Set(),uc:new Set()};
+            ea:new Set(),dev:new Set(),temp:new Set(),tnom:new Set(),uc:new Set(),pend:new Set()};
   ROWS.forEach(r=>{
     if(rowMatches(r,'zona')) av.zona.add(r.zona);
     if(rowMatches(r,'emp'))  av.emp.add(r.emp);
@@ -429,7 +429,7 @@ document.querySelectorAll('[data-set="uo"]').forEach(cb=>{
 });
 applyFilters();
 sb(4); refreshOptions();
-window.exportExcel=exportExcel;
+window._exportExcel=exportExcel;
 
 })();
 </script>
