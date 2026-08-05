@@ -201,7 +201,7 @@ const SEL={zona:new Set(),emp:new Set(),er:new Set(),int_:new Set(),
            ep:new Set(),sp:new Set(),ea:new Set(),dev:new Set(),
            temp:new Set(),tnom:new Set(),uc:new Set(),pend:new Set()};
 
-let filtered=[...ROWS], sCol=4, sDir=1, page=0;
+window.filtered=[...ROWS]; let filtered=window.filtered, sCol=4, sDir=1, page=0;
 const PAGE=150;
 
 function rowMatches(r,ex){
@@ -225,7 +225,7 @@ function rowMatches(r,ex){
 }
 
 function applyFilters(){
-  filtered=ROWS.filter(r=>rowMatches(r,null));
+  filtered=ROWS.filter(r=>rowMatches(r,null)); window.filtered=filtered;
   sortRows(); page=0; render(); refreshOptions();
 }
 
@@ -404,6 +404,7 @@ function exportExcel(){
   const headers=['ZONA','NOMBRE EMPRESARIO','IDPREDIO','ORIGEN','NUMERO ACTA','ESCENARIO',
     'EQUIPO ARCGIS','EQUIPO ACTA','PENDIENTE','DESVIO','TEAM','EQUIPO','VOLUMEN M3SSC','MES'];
   const devL=['ROJO','AMARILLO','VERDE','SIN DATO'];
+  const filtered=window.filtered||[];
   const rows=filtered.map(r=>[r.zona,r.emp,r.idp,r.ori,r.acta,r.esc,r.ep,r.er,r.pend,
     devL[r.dev]||'',r.tnom,r.tcod,r.vol,r.mes]);
   const tot=filtered.reduce((s,r)=>s+r.vol,0);
